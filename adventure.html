@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#130922">
+<title>Stanley Adventure</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0715;color:white;font-family:Arial,sans-serif;text-align:center}
+header{display:flex;justify-content:space-between;align-items:center;background:#1c0d31;padding:15px}
+a{color:#c9a3ff;text-decoration:none}
+h2{color:#c39aff}
+canvas{width:96vw;max-width:800px;aspect-ratio:9/5;background:#171037;border:2px solid #7338cc;border-radius:14px;touch-action:none}
+.controls{display:flex;justify-content:space-between;max-width:800px;margin:15px auto;padding:0 15px;gap:10px}
+button{background:#7539d5;color:white;border:1px solid #aa78fc;border-radius:12px;padding:14px 21px;font-size:20px;touch-action:none}
+#restart{font-size:15px}
+</style>
+</head>
+<body>
+<header><a href="index.html">← STANLEY PLAY</a><strong>🏃 ADVENTURE</strong></header>
+<h2>STANLEY ADVENTURE</h2>
+<p>Recolha as moedas e evite os obstáculos!</p>
+<canvas id="game" width="720" height="400"></canvas>
+<div class="controls">
+<div><button id="left">◀</button> <button id="right">▶</button></div>
+<button id="jump">⬆ PULAR</button>
+</div>
+<p id="score">Moedas: 0/5 | Vidas: 3</p>
+<button id="restart">↻ Reiniciar jogo</button>
+<script>
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const keys={};
+const platforms=[
+{x:0,y:360,w:720,h:40},
+{x:110,y:292,w:130,h:14},
+{x:300,y:230,w:145,h:14},
+{x:505,y:168,w:150,h:14}
+];
+let player,coins,enemy,lives,score,frame,over,win,raf;
+function reset(){
+cancelAnimationFrame(raf);
+player={x:25,y:320,w:28,h:38,vy:0,grounded:false};
+coins=[
+{x:160,y:262,got:false},
+{x:350,y:200,got:false},
+{x:550,y:138,got:false},
+{x:640,y:320,got:false},
+{x:50,y:320,got:false}
+];
+enemy={x:470,y:334,w:24,h:26,dir:1};
+lives=3;score=0;frame=0;over=false;win=false;
+loop();
+}
+function collide(a,b){
+return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+}
+function loop(){
+frame++;
+ctx.fillStyle='#181038';ctx.fillRect(0,0,720,400);
+ctx.fillStyle='#40306e';
+for(let i=0;i<9;i++)ctx.fillRect(i*100,65+(i%3)*30,45,10);
+ctx.fillStyle='#9a63ea';
+platforms.forEach(p=>ctx.fillRect(p.x,p.y,p.w,p.h));
+if(!over){
+if(keys.left)player.x-=4;
+if(keys.right)player.x+=4;
+player.x=Math.max(0,Math.min(692,player.x));
+if(keys.jump&&player.grounded){player.vy=-12;player.grounded=false}
+const previousBottom=player.y+player.h;
+player.vy+=0.55;
+player.y+=player.vy;
+player.grounded=false;
+for(const p of platforms){
+if(player.vy>=0&&previousBottom<=p.y+5&&player.y+player.h>=p.y&&player.x+player.w>p.x&&player.x<p.x+p.w){
+player.y=p.y-player.h;
+player.vy=0;
+player.grounded=true;
+}
+}
+if(player.y>420){
+lives--;
+player.x=25;player.y=300;player.vy=0;
+}
+enemy.x+=enemy.dir*2;
+if(enemy.x>650||enemy.x<455)enemy.dir*=-1;
+if(collide(player,enemy)&&(!player.lastHit||frame-player.lastHit>70)){
+lives--;player.lastHit=frame;
+player.x=25;player.y=300;player.vy=0;
+}
+coins.forEach(c=>{
+if(!c.got&&Math.hypot(player.x+14-c.x,player.y+18-c.y)<30){
+c.got=true;score++;
+}
+});
+if(score===coins.length){over=true;win=true}
+if(lives<=0)over=true;
+}
+ctx.font='28px Arial';
+coins.forEach(c=>{if(!c.got)ctx.fillText('🪙',c.x-12,c.y+10)});
+ctx.fillStyle='#e8b4ff';
+ctx.fillRect(player.x,player.y,player.w,player.h);
+ctx.font='25px Arial';
+ctx.fillText('👾',enemy.x,enemy.y+24);
+if(over){
+ctx.fillStyle='#fff';
+ctx.font='bold 34px Arial';ctx.textAlign='center';
+ctx.fillText(win?'VOCÊ VENCEU!':'FIM DE JOGO',360,190);
+ctx.font='18px Arial';
+ctx.fillText('Toque em reiniciar para jogar novamente',360,225);
+ctx.textAlign='left';
+}
+document.getElementById('score').textContent='Moedas: '+score+'/5 | Vidas: '+Math.max(0,lives);
+raf=requestAnimationFrame(loop);
+}
+for(const [id,key] of [['left','left'],['right','right'],['jump','jump']]){
+const b=document.getElementById(id);
+b.addEventListener('pointerdown',e=>{
+e.preventDefault();keys[key]=true;b.setPointerCapture(e.pointerId);
+});
+for(const type of ['pointerup','pointercancel','lostpointercapture']){
+b.addEventListener(type,()=>keys[key]=false);
+}
+}
+document.addEventListener('keydown',e=>{
+const k={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'jump',Space:'jump'}[e.code];
+if(k){keys[k]=true;e.preventDefault()}
+});
+document.addEventListener('keyup',e=>{
+const k={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'jump',Space:'jump'}[e.code];
+if(k)keys[k]=false;
+});
+document.getElementById('restart').onclick=reset;
+reset();
+</script>
+</body>
+</html>
