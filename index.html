@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#130922">
+<title>STANLEY PLAY</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0715;color:white;font-family:Arial,sans-serif}header{padding:22px;background:#170c2b;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:24px;margin:0;color:#c39aff}a{color:white;text-decoration:none}.hero{margin:18px;padding:35px 20px;border-radius:20px;background:linear-gradient(125deg,#351466,#8a35de,#231244)}.hero h2{font-size:30px}.btn{background:#8a42ea;color:white;border:0;border-radius:12px;padding:12px 16px;cursor:pointer}.wrap{padding:18px}.search{width:100%;padding:15px;background:#241434;border:1px solid #65438e;color:white;border-radius:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}.card{background:#1e122e;border-radius:16px;overflow:hidden}.cover{height:130px;display:grid;place-items:center;background:linear-gradient(145deg,#5923a2,#241238);font-size:65px}.info{padding:14px}.info h3{margin:0 0 10px}.actions{display:flex;gap:8px}.actions button{flex:1}.nav{position:fixed;bottom:0;left:0;right:0;padding:13px;background:#1a1028;display:flex;justify-content:space-around}.nav button{background:none;border:0;color:#e0cfff;font-size:13px}@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.hero{padding:60px}}
+</style>
+</head>
+<body>
+<header><h1>🎮 STANLEY PLAY</h1><span>V2.0</span></header>
+<section class="hero"><h2>Seu universo gamer</h2><p>Jogos exclusivos e consoles clássicos em um só lugar.</p><button class="btn" onclick="document.querySelector('.wrap').scrollIntoView()">Explorar jogos ▶</button></section>
+<main class="wrap"><input class="search" id="search" placeholder="🔎 Pesquisar jogos"><h2 id="heading">Jogos disponíveis</h2><div id="games" class="grid"></div></main>
+<nav class="nav"><button onclick="show('all')">⌂ Início</button><button onclick="show('games')">🎮 Jogos</button><button onclick="show('favorites')">♥ Favoritos</button></nav>
+<script>
+const catalog=[{id:'retro',name:'STANLEY RETRO',icon:'🕹️',url:'retro.html'},{id:'space',name:'Stanley Space',icon:'🚀',url:'space.html'},{id:'adventure',name:'Stanley Adventure',icon:'🏃',url:'adventure.html'}];
+let mode='all';let favorites=[];try{favorites=JSON.parse(localStorage.getItem('stanley_favorites')||'[]')}catch(e){}
+function render(){let q=document.getElementById('search').value.toLowerCase();document.getElementById('heading').textContent=mode==='favorites'?'Meus favoritos':'Jogos disponíveis';document.getElementById('games').innerHTML=catalog.filter(g=>g.name.toLowerCase().includes(q)&&(mode!=='favorites'||favorites.includes(g.id))).map(g=>'<article class="card"><div class="cover">'+g.icon+'</div><div class="info"><h3>'+g.name+'</h3><div class="actions"><button class="btn" onclick="location.href=\''+g.url+'\'">▶ Jogar</button><button class="btn" onclick="favorite(\''+g.id+'\')">'+(favorites.includes(g.id)?'♥':'♡')+'</button></div></div></article>').join('')||'<p>Nenhum jogo encontrado.</p>'}
+function show(m){mode=m;render()}function favorite(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];localStorage.setItem('stanley_favorites',JSON.stringify(favorites));render()}document.getElementById('search').addEventListener('input',render);render();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(console.warn)}
+</script></body></html>
