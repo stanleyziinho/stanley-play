@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#130922">
+<title>Stanley Space</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090514;color:white;font-family:Arial,sans-serif;text-align:center}
+header{padding:14px;background:#1d1032;display:flex;justify-content:space-between;align-items:center}
+a{color:#c7a3ff;text-decoration:none}
+h2{color:#bd8cff}
+canvas{width:96vw;max-width:800px;aspect-ratio:9/5;background:#050a20;border:2px solid #7435cb;border-radius:14px;touch-action:none}
+.controls{display:flex;justify-content:space-between;max-width:800px;margin:15px auto;padding:0 18px;gap:10px}
+button{background:#7534ce;color:white;border:1px solid #a878ff;border-radius:14px;padding:15px 22px;font-size:20px;touch-action:none}
+#restart{font-size:15px}
+</style>
+</head>
+<body>
+<header><a href="index.html">← STANLEY PLAY</a><strong>🚀 SPACE</strong></header>
+<h2>STANLEY SPACE</h2>
+<p>Destrua os asteroides e sobreviva!</p>
+<canvas id="game" width="720" height="400"></canvas>
+<div class="controls">
+<div><button id="left">◀</button> <button id="right">▶</button></div>
+<button id="fire">🔥 ATIRAR</button>
+</div>
+<p id="score">Pontos: 0 | Vidas: 3</p>
+<button id="restart">↻ Reiniciar jogo</button>
+<script>
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const keys={};
+let player,shots,rocks,score,lives,frame,over,raf;
+function reset(){
+cancelAnimationFrame(raf);
+player={x:340,y:335,w:40,h:40};
+shots=[];rocks=[];score=0;lives=3;frame=0;over=false;
+loop();
+}
+function rectangle(a,b){
+return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+}
+function shoot(){
+if(over)return;
+if(frame-(player.lastShot||-100)<12)return;
+shots.push({x:player.x+18,y:player.y,w:4,h:15});
+player.lastShot=frame;
+}
+function loop(){
+frame++;
+ctx.fillStyle='#070c27';
+ctx.fillRect(0,0,720,400);
+for(let i=0;i<45;i++){
+ctx.fillStyle='#aa8bdf';
+ctx.fillRect((i*113)%720,(i*73+frame)%400,2,2);
+}
+if(!over){
+if(keys.left)player.x-=5;
+if(keys.right)player.x+=5;
+if(keys.fire)shoot();
+player.x=Math.max(0,Math.min(680,player.x));
+if(frame%35===0)rocks.push({x:Math.random()*680,y:-30,w:34,h:34});
+shots.forEach(s=>s.y-=9);
+rocks.forEach(r=>r.y+=3);
+for(let i=rocks.length-1;i>=0;i--){
+const r=rocks[i];
+if(rectangle(r,player)){lives--;rocks.splice(i,1);continue}
+if(r.y>400){lives--;rocks.splice(i,1);continue}
+for(let j=shots.length-1;j>=0;j--){
+if(rectangle(r,shots[j])){
+rocks.splice(i,1);shots.splice(j,1);score+=10;break;
+}
+}
+}
+shots=shots.filter(s=>s.y>-20);
+ctx.font='36px Arial';
+ctx.fillText('🚀',player.x,player.y+35);
+ctx.fillStyle='#00ffff';
+shots.forEach(s=>ctx.fillRect(s.x,s.y,s.w,s.h));
+ctx.font='34px Arial';
+rocks.forEach(r=>ctx.fillText('☄️',r.x,r.y+30));
+if(lives<=0)over=true;
+}else{
+ctx.fillStyle='white';ctx.font='bold 38px Arial';
+ctx.textAlign='center';
+ctx.fillText('FIM DE JOGO',360,185);
+ctx.font='22px Arial';
+ctx.fillText('Pontuação: '+score,360,225);
+ctx.textAlign='left';
+}
+document.getElementById('score').textContent='Pontos: '+score+' | Vidas: '+Math.max(0,lives);
+raf=requestAnimationFrame(loop);
+}
+for(const [id,key] of [['left','left'],['right','right'],['fire','fire']]){
+const b=document.getElementById(id);
+b.addEventListener('pointerdown',e=>{e.preventDefault();keys[key]=true;b.setPointerCapture(e.pointerId)});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])
+b.addEventListener(type,()=>keys[key]=false);
+}
+document.addEventListener('keydown',e=>{
+const k={ArrowLeft:'left',ArrowRight:'right',Space:'fire',KeyZ:'fire'}[e.code];
+if(k){keys[k]=true;e.preventDefault()}
+});
+document.addEventListener('keyup',e=>{
+const k={ArrowLeft:'left',ArrowRight:'right',Space:'fire',KeyZ:'fire'}[e.code];
+if(k)keys[k]=false;
+});
+document.getElementById('restart').onclick=reset;
+reset();
+</script>
+</body>
+</html>
