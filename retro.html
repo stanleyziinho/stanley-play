@@ -4,32 +4,91 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#130922">
-<title>STANLEY RETRO</title>
+<title>STANLEY RETRO V2.1</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(135deg,#0b0715,#24103f);color:white;font-family:Arial,sans-serif;min-height:100vh}
-main{max-width:960px;margin:auto;padding:20px}
-a{color:#c4a2ff;text-decoration:none}
-h1{font-size:32px;margin-top:30px}
-h1 span{color:#b06cff}
-.panel{background:#1e1231;border:1px solid #593487;border-radius:18px;padding:20px;margin:20px 0}
+body{margin:0;background:radial-gradient(circle at top right,#371368,#0b0715 65%);color:white;font-family:Arial,sans-serif;min-height:100vh}
+main{max-width:1050px;margin:auto;padding:20px}
+a{color:#c7a3ff;text-decoration:none}
+h1{font-size:32px;margin:28px 0 8px}
+h1 span{color:#b17aff}
+p{color:#cdbce0;line-height:1.5}
+.panel{background:#1c112c;border:1px solid #563783;border-radius:18px;padding:20px;margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:linear-gradient(140deg,#3a1d64,#21132f);border:1px solid #6a3e98;border-radius:15px;padding:18px;text-align:center}
+.icon{font-size:40px}
+.card h3{font-size:16px;margin:10px 0}
+.card p{font-size:12px;min-height:35px}
+.btn,button{display:inline-block;background:#813de5;color:white;border:0;border-radius:11px;padding:12px 15px;font-size:14px;font-weight:bold;cursor:pointer}
+.card .btn{width:100%;font-size:12px}
 label{display:block;margin:15px 0 8px;font-weight:bold}
-select,input{display:block;width:100%;background:#301b48;color:white;border:1px solid #7946aa;border-radius:12px;padding:14px;font-size:16px}
-button{background:#813de5;color:white;border:0;border-radius:12px;padding:14px 20px;font-size:16px;font-weight:bold;margin-top:18px}
-button:disabled{opacity:.5}
-p{color:#c9b9de;line-height:1.6}
-#game{width:100%;height:500px;background:#07040e;border-radius:12px}
+select,input{width:100%;background:#301b48;color:white;border:1px solid #7946aa;border-radius:12px;padding:14px;font-size:16px}
+#game{width:100%;height:500px;min-height:300px;background:#06030c;border-radius:12px}
 #player{display:none}
+.note{font-size:12px;color:#baa9ce}
+@media(min-width:750px){.grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
 <main>
-<a href="index.html">← Voltar ao STANLEY PLAY</a>
+<a href="./index.html">← Voltar ao STANLEY PLAY</a>
 <h1>🕹 STANLEY <span>RETRO</span></h1>
-<p>Seu console de jogos clássicos diretamente no navegador.</p>
+<p>Explore jogos clássicos independentes e jogue diretamente no seu navegador.</p>
+
+<section class="panel">
+<h2>🎮 Biblioteca por console</h2>
+<p>Encontre jogos homebrew nos catálogos dos criadores.</p>
+<div class="grid">
+
+<div class="card">
+<div class="icon">🎮</div>
+<h3>Nintendo NES</h3>
+<p>Jogos retrô de 8 bits</p>
+<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/free/tag-homebrew/tag-nes-rom">Encontrar jogos ↗</a>
+</div>
+
+<div class="card">
+<div class="icon">🕹️</div>
+<h3>Super Nintendo</h3>
+<p>Aventura e jogos 16 bits</p>
+<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/free/tag-homebrew/tag-snes-rom">Encontrar jogos ↗</a>
+</div>
+
+<div class="card">
+<div class="icon">⚡</div>
+<h3>Mega Drive</h3>
+<p>Jogos independentes de ação</p>
+<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/free/tag-homebrew/tag-sega-genesis">Encontrar jogos ↗</a>
+</div>
+
+<div class="card">
+<div class="icon">🎲</div>
+<h3>Game Boy</h3>
+<p>Jogos portáteis clássicos</p>
+<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/downloadable/tag-gameboy-rom/tag-homebrew">Encontrar jogos ↗</a>
+</div>
+
+<div class="card">
+<div class="icon">🌈</div>
+<h3>Game Boy Color</h3>
+<p>Jogos portáteis coloridos</p>
+<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/tag-gameboy-rom/tag-homebrew">Encontrar jogos ↗</a>
+</div>
+
+<div class="card">
+<div class="icon">🚀</div>
+<h3>Game Boy Advance</h3>
+<p>Explore projetos independentes</p>
+<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/search?q=game+boy+advance+homebrew+rom">Encontrar jogos ↗</a>
+</div>
+</div>
+<p class="note">Os catálogos são externos. Nem todos os projetos oferecem ROMs compatíveis, gratuitas ou autorizadas para redistribuição. Confira a página de cada criador.</p>
+</section>
+
 <section class="panel" id="setup">
-<h2>Escolha seu console</h2>
-<label for="core">Console</label>
+<h2>📂 Importar e jogar</h2>
+<p>Baixe uma ROM permitida no catálogo, volte aqui e selecione o arquivo salvo no seu dispositivo.</p>
+<label for="core">Selecione o console</label>
 <select id="core">
 <option value="nes">Nintendo NES</option>
 <option value="snes">Super Nintendo</option>
@@ -38,15 +97,16 @@ p{color:#c9b9de;line-height:1.6}
 <option value="gbc">Game Boy Color</option>
 <option value="gba">Game Boy Advance</option>
 </select>
-<label for="rom">Importar ROM autorizada</label>
+<label for="rom">Selecionar ROM</label>
 <input id="rom" type="file" accept=".nes,.sfc,.smc,.md,.gen,.bin,.gb,.gbc,.gba,.zip">
-<p>Selecione um arquivo de jogo que você tenha autorização para utilizar. Nenhuma ROM comercial está incluída.</p>
+<p class="note">Nenhum arquivo é enviado ao servidor do STANLEY PLAY. A primeira execução precisa de internet para carregar o EmulatorJS.</p>
 <button id="start" disabled>▶ INICIAR JOGO</button>
-<p id="status"></p>
+<p id="status" role="status"></p>
 </section>
+
 <section class="panel" id="player">
 <button onclick="location.reload()">↩ Trocar jogo</button>
-<p>Use os controles virtuais, teclado ou controle compatível.</p>
+<p>Use controles na tela, teclado ou gamepad compatível.</p>
 <div id="game"></div>
 </section>
 </main>
@@ -55,42 +115,46 @@ const rom=document.getElementById('rom');
 const core=document.getElementById('core');
 const start=document.getElementById('start');
 const status=document.getElementById('status');
+let romURL=null;
 rom.addEventListener('change',()=>{
-start.disabled=!rom.files.length;
-status.textContent=rom.files.length?'Arquivo selecionado: '+rom.files[0].name:'';
+ start.disabled=!rom.files.length;
+ status.textContent=rom.files.length?'Arquivo selecionado: '+rom.files[0].name:'';
 });
 start.addEventListener('click',()=>{
-if(!rom.files.length)return;
-const file=rom.files[0];
-const allowed={
-nes:['nes','zip'],
-snes:['sfc','smc','zip'],
-segaMD:['md','gen','bin','zip'],
-gb:['gb','zip'],
-gbc:['gbc','zip'],
-gba:['gba','zip']
-};
-const ext=file.name.split('.').pop().toLowerCase();
-if(!allowed[core.value].includes(ext)){
-status.textContent='Arquivo incompatível com o console selecionado.';
-return;
-}
-const fileUrl=URL.createObjectURL(file);
-document.getElementById('setup').style.display='none';
-document.getElementById('player').style.display='block';
-window.EJS_player='#game';
-window.EJS_core=core.value;
-window.EJS_gameUrl=fileUrl;
-window.EJS_gameName=file.name;
-window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
-window.EJS_color='#8b5cf6';
-window.EJS_startOnLoaded=true;
-const script=document.createElement('script');
-script.src='https://cdn.emulatorjs.org/stable/data/loader.js';
-script.onerror=()=>{
-document.getElementById('player').insertAdjacentHTML('beforeend','<p>Erro ao carregar o emulador. Verifique a internet.</p>');
-};
-document.body.appendChild(script);
+ const file=rom.files[0];
+ if(!file)return;
+ const allowed={
+  nes:['nes','zip'],
+  snes:['sfc','smc','zip'],
+  segaMD:['md','gen','bin','zip'],
+  gb:['gb','zip'],
+  gbc:['gbc','zip'],
+  gba:['gba','zip']
+ };
+ const ext=file.name.split('.').pop().toLowerCase();
+ if(!allowed[core.value].includes(ext)){
+  status.textContent='Arquivo incompatível com o console selecionado.';
+  return;
+ }
+ romURL=URL.createObjectURL(file);
+ document.getElementById('setup').style.display='none';
+ document.getElementById('player').style.display='block';
+ window.EJS_player='#game';
+ window.EJS_core=core.value;
+ window.EJS_gameUrl=romURL;
+ window.EJS_gameName=file.name;
+ window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
+ window.EJS_color='#8b5cf6';
+ window.EJS_startOnLoaded=true;
+ const script=document.createElement('script');
+ script.src='https://cdn.emulatorjs.org/stable/data/loader.js';
+ script.onerror=()=>{
+  document.getElementById('player').insertAdjacentHTML('beforeend','<p>Erro ao carregar o emulador. Verifique a conexão.</p>');
+ };
+ document.body.appendChild(script);
+});
+window.addEventListener('pagehide',()=>{
+ if(romURL)URL.revokeObjectURL(romURL);
 });
 </script>
 </body>
