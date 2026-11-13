@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#050c19"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>STANLEY GPS ULTRA | V3.2</title>
+<title>STANLEY GPS ULTRA | V3.3</title>
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22STANLEY%20GPS%20ULTRA%22%2C%22short_name%22%3A%22STANLEY%20GPS%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%2F%22%2C%22background_color%22%3A%22%23050c19%22%2C%22theme_color%22%3A%22%23050c19%22%7D">
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoWBrh0Dk7BUdo=" crossorigin="">
 <style>
@@ -27,10 +27,22 @@
 .leaflet-tile{filter:none!important;max-width:none!important;max-height:none!important}
 .leaflet-map-pane,.leaflet-tile-pane{will-change:auto}
 @supports (height:100dvh){#map,.app{height:100dvh;bottom:auto}}
+
+/* STANLEY GPS V3.3 â Leaflet/iOS: evita azulejos deslocados por CSS externo. */
+#map {width:100vw!important;height:100vh!important;height:100dvh!important;overflow:hidden!important;transform:none!important;contain:layout paint;}
+#map .leaflet-pane,#map .leaflet-map-pane,#map .leaflet-tile-pane,#map .leaflet-layer {transform-origin:0 0;}
+#map .leaflet-tile {width:256px;height:256px;max-width:none!important;max-height:none!important;object-fit:fill!important;transform-origin:0 0;image-rendering:auto;}
+#map .leaflet-container img {max-width:none!important;}
+#map .leaflet-control-container {pointer-events:none;}
+.mapWarning{position:absolute;left:10px;right:10px;top:calc(env(safe-area-inset-top) + 300px);z-index:940;padding:12px;border:1px solid #ffba4980;background:#261c21e8;color:#ffe6bb;font-size:12px;border-radius:14px;display:none;max-width:360px;}
+.results{max-height:48dvh;}
+.result.primaryMatch{background:#163a5d;}
+.searchTip{font-size:11px;padding:9px 13px;color:#a9d8f1;background:#0c2842e8;border-radius:14px;border:1px solid #8bbfff35;}
 </style>
 </head>
 <body>
 <div id="map" aria-label="Mapa interativo"></div>
+<div class="mapWarning" id="mapWarning">Mapa incompleto: trocando a fonte automaticamente. Verifique tambÃ©m sua conexÃ£o.</div>
 <div class="app" id="app">
  <header class="top">
   <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.1</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
@@ -66,24 +78,35 @@ const S={position:null,destination:null,routes:[],selected:0,running:false,voice
 const map=L.map('map',{zoomControl:false,preferCanvas:true,fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false}).setView([-19.9167,-43.9345],13);
 // Fontes abertas sem uso de tiles comerciais que exigem chave de API.
 const layers=[
- {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors',name:'Ruas'},
- {url:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors, HOT',name:'Detalhado'}
+ {url:'https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png',subdomains:'abcd',credit:'&copy; OpenStreetMap &copy; CARTO',name:'Detalhado'},
+ {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',subdomains:'',credit:'&copy; OpenStreetMap contributors',name:'Ruas'},
+ {url:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',subdomains:'abc',credit:'&copy; OpenStreetMap contributors, HOT',name:'Alternativo'}
 ];
 let tiles;
 let tileErrorCount=0;
-function mountTiles(index=0){
+let fallbackUsed=false;
+function mountTiles(index=0,automatic=false){
   if(tiles)map.removeLayer(tiles);
   tileErrorCount=0;
   S.style=index;
-  tiles=L.tileLayer(layers[index].url,{
-    attribution:layers[index].credit,maxNativeZoom:19,maxZoom:19,minZoom:3,
-    updateWhenIdle:true,keepBuffer:5,crossOrigin:false,
-    errorTileUrl:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#dfe9e3"/><path d="M0 128H256M128 0V256" stroke="#bdcfc6" stroke-width="2"/></svg>')
+  const config=layers[index];
+  tiles=L.tileLayer(config.url,{
+    subdomains:config.subdomains,attribution:config.credit,
+    tileSize:256,zoomOffset:0,maxNativeZoom:19,maxZoom:19,minZoom:3,
+    detectRetina:false,updateWhenIdle:true,keepBuffer:3,
+    fadeAnimation:false,crossOrigin:false,
+    errorTileUrl:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#d6e3df"/><path d="M0 128H256M128 0V256" stroke="#b1c6bf" stroke-width="2"/></svg>')
   }).addTo(map);
   tiles.on('tileerror',()=>{
-    if(++tileErrorCount===4)toast('Alguns trechos do mapa nÃ£o carregaram. Verifique a internet ou troque o tipo de mapa.');
+    tileErrorCount++;
+    if(tileErrorCount>=3&&!fallbackUsed){
+      fallbackUsed=true;
+      el('mapWarning').style.display='block';
+      setTimeout(()=>{el('mapWarning').style.display='none';mountTiles((S.style+1)%layers.length,true)},500);
+    }
   });
   map.invalidateSize({pan:false});
+  if(!automatic)fallbackUsed=false;
 }
 mountTiles(0);
 // Corrige dimensÃµes de mosaicos em Safari quando a barra do navegador muda de tamanho.
@@ -134,15 +157,34 @@ function photonPlace(f){
  const address=[p.street,p.housenumber,p.district,p.city,p.state,p.country].filter(Boolean).join(', ');
  return {lat:coordinates[1],lon:coordinates[0],name,address:address||name};
 }
-function showResults(places){
+function normalizeText(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
+function relevance(place,query){
+ const q=normalizeText(query),name=normalizeText(place.name),full=normalizeText(place.address);
+ const terms=q.split(' ').filter(x=>x.length>2);
+ let score=0;
+ if(name===q)score+=80;
+ if(name.includes(q))score+=45;
+ if(full.includes(q))score+=40;
+ for(const t of terms){if(name.includes(t))score+=9;else if(full.includes(t))score+=5;else score-=7}
+ if(place.source==='EndereÃ§o detalhado')score+=12;
+ if(S.position){let d=distBetween(S.position,place);if(d<30000)score+=8;else if(d>80000)score-=5}
+ return score
+}
+function showResults(places,query){
  const box=el('results');box.replaceChildren();
- if(!places.length){box.innerHTML='<div class="resultsHint">Nenhum endereÃ§o encontrado. Tente rua + nÃºmero + cidade, ou pesquise um ponto de referÃªncia.</div>';return}
- const seen=new Set();
- places.forEach(x=>{
-  if(!x||!Number.isFinite(+x.lat)||!Number.isFinite(+x.lon))return;
-  const key=(+x.lat).toFixed(5)+','+(+x.lon).toFixed(5);if(seen.has(key))return;seen.add(key);
-  const b=document.createElement('button');b.className='result';b.setAttribute('role','option');
-  const a=document.createElement('strong'),d=document.createElement('small');a.textContent=x.name||'Destino';d.textContent=x.address||'Local encontrado';
+ const unique=[];const seen=new Set();
+ places.filter(x=>x&&Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)).forEach(x=>{
+  const key=(+x.lat).toFixed(5)+','+(+x.lon).toFixed(5);
+  if(seen.has(key))return; seen.add(key);unique.push(x)
+ });
+ unique.sort((a,b)=>relevance(b,query)-relevance(a,query));
+ if(!unique.length){box.innerHTML='<div class="resultsHint">NÃ£o encontrei esse endereÃ§o. Digite rua, nÃºmero, bairro e cidade ou marque o ponto diretamente no mapa.</div>';return}
+ const label=document.createElement('div');label.className='searchTip';label.textContent='Confira o endereÃ§o completo antes de selecionar. Nenhuma rota serÃ¡ iniciada automaticamente.';box.append(label);
+ unique.slice(0,18).forEach((x,i)=>{
+  const b=document.createElement('button');b.className='result'+(i===0?' primaryMatch':'');
+  const a=document.createElement('strong'),d=document.createElement('small');
+  a.textContent=(i===0?'Melhor correspondÃªncia: ':'')+(x.name||'Destino');
+  d.textContent=(x.address||'Local encontrado')+' Â· '+(x.source||'Mapa');
   b.append(a,d);b.onclick=()=>setDestination(x);box.append(b)
  });
 }
@@ -151,23 +193,21 @@ async function lookup(){
  if(q.length<3){toast('Digite ao menos 3 caracteres para pesquisar.');return}
  if(S.searchRequest)S.searchRequest.abort();
  S.searchRequest=new AbortController();const signal=S.searchRequest.signal;
- const box=el('results');box.style.display='block';box.innerHTML='<div class="resultsHint">Buscando ruas, nÃºmeros e estabelecimentos...</div>';
- const params=new URLSearchParams({q,limit:'12',lang:'pt'});
- if(S.position){params.set('lat',String(S.position.lat));params.set('lon',String(S.position.lon))}
+ const box=el('results');box.style.display='block';box.innerHTML='<div class="resultsHint">Conferindo ruas, nÃºmeros e estabelecimentos...</div>';
+ let all=[];
+ // Nominatim prioriza endereÃ§o completo, com cidade, nÃºmero e CEP quando existentes.
  try{
-  const r=await fetch('https://photon.komoot.io/api/?'+params.toString(),{signal});
-  if(!r.ok)throw Error('photon');
-  const data=await r.json();
-  const places=(data.features||[]).map(photonPlace).filter(Boolean);
-  if(places.length){showResults(places);return}
+   const params=new URLSearchParams({format:'jsonv2',limit:'10',addressdetails:'1',q});
+   const r=await fetch('https://nominatim.openstreetmap.org/search?'+params,{signal,headers:{'Accept-Language':'pt-BR,pt'}});
+   if(r.ok){const data=await r.json();all.push(...data.map(x=>({lat:+x.lat,lon:+x.lon,name:x.name||x.display_name.split(',')[0],address:x.display_name,source:'EndereÃ§o detalhado'})))}
  }catch(e){if(e.name==='AbortError')return}
  try{
-  const url='https://nominatim.openstreetmap.org/search?'+new URLSearchParams({format:'json',limit:'12',addressdetails:'1',q}).toString();
-  const r=await fetch(url,{signal,headers:{'Accept-Language':'pt-BR,pt'}});
-  if(!r.ok)throw Error('nominatim');
-  const data=await r.json();
-  showResults(data.map(x=>({lat:+x.lat,lon:+x.lon,name:x.name||x.display_name.split(',')[0],address:x.display_name})));
- }catch(e){if(e.name!=='AbortError')box.innerHTML='<div class="resultsHint">ServiÃ§os de busca indisponÃ­veis. Verifique a internet e tente novamente.</div>'}
+   const params=new URLSearchParams({q,limit:'15',lang:'pt'});
+   if(S.position){params.set('lat',String(S.position.lat));params.set('lon',String(S.position.lon))}
+   const r=await fetch('https://photon.komoot.io/api/?'+params,{signal});
+   if(r.ok){const data=await r.json();all.push(...(data.features||[]).map(photonPlace).filter(Boolean).map(x=>({...x,source:'Lugares e ruas'})))}
+ }catch(e){if(e.name==='AbortError')return}
+ showResults(all,q);
 }
 function setDestination(d){stop();S.destination=d;S.routes=[];S.selected=0;S.request++;S.lastVoice=-1;el('results').style.display='none';el('search').value=d.name;el('destinationTitle').textContent=d.name;el('destinationAddress').textContent=d.address||'Destino no mapa';el('eyebrow').textContent='DESTINO SELECIONADO';el('eta').textContent='\u2014';el('distance').textContent='\u2014';el('arrival').textContent='\u2014';el('routeList').replaceChildren();renderSteps();if(destMarker)map.removeLayer(destMarker);destMarker=L.marker([d.lat,d.lon],{icon:L.divIcon({className:'',html:'<div class="pin">\ud83d\udccd</div>',iconSize:[36,43],iconAnchor:[18,39]})}).addTo(map);routeLines.forEach(x=>map.removeLayer(x));routeLines=[];updateFavoriteIcon();if(S.position)routeTo();else{map.setView([d.lat,d.lon],14);toast('Toque em \u25ce para ativar o GPS e calcular a rota.')}}
 async function routeTo(){
@@ -210,8 +250,22 @@ function setTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.tog
 el('tabNavigate').onclick=()=>{setTab('tabNavigate');el('sheet').classList.remove('collapsed')};
 el('tabRoutes').onclick=()=>{setTab('tabRoutes');if(!S.routes.length)toast('Pesquise um destino para visualizar rotas.');else{el('sheet').classList.remove('collapsed');el('routeList').scrollIntoView({behavior:'smooth',block:'nearest'})}};
 el('tabSaved').onclick=()=>{setTab('tabSaved');openSaved()};el('tabMap').onclick=()=>{setTab('tabMap');el('sheet').classList.add('collapsed');viewFullRoute()};
-el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.2: mapas OpenStreetMap/HOT, busca Photon/Nominatim, rotas OSRM. Sem trÃ¢nsito ao vivo/offline.')};
+el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.3: mapas OpenStreetMap/HOT, busca Photon/Nominatim, rotas OSRM. Sem trÃ¢nsito ao vivo/offline.')};
 map.on('dragstart',()=>{S.following=false});
+// Quando o nÃºmero nÃ£o existe no mapa, pressione por 1 segundo no ponto desejado.
+let pinPressTimer=null, pinPressStartedAt=0;
+map.on('mousedown touchstart',e=>{
+  pinPressStartedAt=Date.now();
+  clearTimeout(pinPressTimer);
+  const latlng=e.latlng;
+  if(!latlng)return;
+  pinPressTimer=setTimeout(()=>{
+    const p={lat:latlng.lat,lon:latlng.lng,name:'Ponto escolhido no mapa',address:'Coordenadas '+latlng.lat.toFixed(5)+', '+latlng.lng.toFixed(5)};
+    if(confirm('Usar este ponto como destino?'))setDestination(p);
+  },850);
+});
+map.on('mouseup touchend dragstart zoomstart',()=>clearTimeout(pinPressTimer));
+
 window.addEventListener('pagehide',()=>{if(S.watch!==null){navigator.geolocation.clearWatch(S.watch);S.watch=null}});
 // Pede a localizacao ao abrir; se bloqueada, toque em Meu GPS.
 setTimeout(gps,800);
