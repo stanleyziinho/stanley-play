@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#050c19"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>STANLEY GPS ULTRA | V3.7</title>
+<title>STANLEY GPS ULTRA | V3.8</title>
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22STANLEY%20GPS%20ULTRA%22%2C%22short_name%22%3A%22STANLEY%20GPS%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%2F%22%2C%22background_color%22%3A%22%23050c19%22%2C%22theme_color%22%3A%22%23050c19%22%7D">
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoWBrh0Dk7BUdo=" crossorigin="">
 <style>
@@ -85,7 +85,7 @@
 @media(max-height:760px){.sheet{max-height:52dvh!important}.sheet.collapsed{max-height:220px!important}}
 
 
-/* V3.7: HUD de direÃ§Ã£o e painel mais legÃ­vel em telas pequenas */
+/* V3.8: HUD de direÃ§Ã£o e painel mais legÃ­vel em telas pequenas */
 .speed{width:105px!important;min-height:126px;padding:14px 8px!important;border:1px solid #45bfff70!important;background:linear-gradient(140deg,#0c3150f5,#07172af5)!important;box-shadow:0 10px 28px #001325aa!important}
 .speedCaption{font-size:9px;letter-spacing:.13em;color:#a7ddff;font-weight:800;margin-bottom:7px}
 .speed b{font-size:40px!important;color:#fff;line-height:1.05}
@@ -99,7 +99,31 @@
 .driving .roadEvents{bottom:calc(env(safe-area-inset-bottom) + min(45dvh,390px) + 20px)}
 .carMarker{width:40px;height:40px;display:grid;place-items:center;font-size:26px;filter:drop-shadow(0 4px 8px #000a);transition:transform .25s;line-height:1}
 .poiMarker{font-size:22px;filter:drop-shadow(0 2px 5px #000a);text-shadow:0 0 6px #000}
-@media(max-height:740px){.roadEvents{display:none}.speed{width:88px!important;min-height:100px}.speed b{font-size:31px!important}}
+@media(max-height:740px){.roadEvents{max-width:190px;font-size:10px}.speed{width:88px!important;min-height:100px}.speed b{font-size:31px!important}}
+</style>
+
+<style id="stanley-v38-style">
+.stanleyCarIcon{border:0!important;background:transparent!important}
+.carVehicle{width:64px;height:76px;display:flex;justify-content:center;align-items:center;transform-origin:32px 42px;filter:drop-shadow(0 7px 9px #06152ecc)}
+.carVehicle svg{overflow:visible}
+.roadEvents{background:#0d2139f0!important;border:1px solid #5ca8d870!important;backdrop-filter:blur(10px);max-width:225px!important}
+.eventGlyph{display:inline-grid;place-items:center;width:19px;height:19px;background:#f4ad3f;color:#111;border-radius:6px;font-size:13px;font-weight:900;margin-right:5px}
+.poiMarker{width:32px;height:32px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;background:#073c78;border-radius:50%;box-shadow:0 2px 9px #03152a88;color:#fff;font:bold 19px system-ui}
+.poiSignal{width:25px!important;height:35px!important;border-radius:11px!important;flex-direction:column;gap:2px;background:#172237!important;font-size:12px;line-height:8px;color:#ff6262}
+.poiSignal span{color:#ffd659}.poiSignal em{font-style:normal;color:#39ee8b}
+.poiRadar{background:#e95736!important;font-size:15px!important}
+.stats .stat{padding:13px 10px!important;min-height:110px!important}
+.stats .stat label{font-family:system-ui!important;font-weight:800!important;letter-spacing:.06em!important;font-size:10px!important;text-transform:uppercase!important;display:block;white-space:normal;overflow-wrap:anywhere;color:#b9d5eb!important}
+.stats .stat strong{font-variant-numeric:tabular-nums;font-size:21px!important;letter-spacing:-.045em!important}
+.stats .stat:first-child strong{font-size:25px!important}
+.stats .stat small{display:block;margin-top:8px;font-size:10px;color:#b8d2ec}
+.speed{border-color:#5bd3ff88!important}
+@media(max-width:390px){
+.stats .stat{padding:12px 8px!important}
+.stats .stat strong{font-size:19px!important}
+.stats .stat:first-child strong{font-size:23px!important}
+.roadEvents{max-width:190px!important}
+}
 </style>
 </head>
 <body>
@@ -108,7 +132,7 @@
 <div id="tileDiagnostic" aria-live="polite" style="position:fixed;z-index:970;left:12px;top:calc(env(safe-area-inset-top) + 300px);background:#092035eb;border:1px solid #81cfff66;border-radius:10px;padding:6px 9px;font:10px system-ui;color:#daf3ff;pointer-events:none">Mapa: iniciando...</div>
 <div class="app" id="app">
  <header class="top">
-  <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.7</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
+  <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.8</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
   <div class="search glass"><span class="glassIcon">&#8981;</span><input id="search" placeholder="Para onde vamos hoje?" aria-label="Buscar endere&#231;o"><button class="roundSearch" id="searchButton" aria-label="Pesquisar">&#10140;</button></div>
   <div class="results glass" id="results" role="listbox"></div>
   <nav class="quick"><button id="quickHome">&#8962; &nbsp;Casa</button><button id="quickWork">&#9635; &nbsp;Trabalho</button><button id="quickFavorite">&#9733; &nbsp;Favoritos</button><button id="quickGPS">&#9678; &nbsp;Meu GPS</button></nav>
@@ -116,19 +140,19 @@
  <div class="hud"><div class="speed glass"><div class="speedCaption">VELOCIDADE</div><b id="speed">&#8212;</b><div class="unit">km/h</div><small id="speedQuality">Sem leitura</small></div><div class="bearing glass">RUMO &nbsp;<span id="heading">&#8212;</span></div></div>
  <div class="side"><button class="round glass" id="locate" title="Minha posi&#231;&#227;o">&#8982;</button><button class="round glass" id="layer" title="Trocar mapa">&#9672;</button><button class="round glass" id="zoomIn" title="Ampliar">+</button><button class="round glass" id="zoomOut" title="Reduzir">&#8722;</button><button class="round glass" id="viewRoute" title="Ver rota inteira">&#9671;</button></div>
  <div class="statusToast glass" id="toast" role="status"></div>
- <div class="roadEvents glass" id="roadEvents" aria-live="polite"><b>ð¦ Sinais e radares</b><span id="roadEventsText">Selecione uma rota para consultar</span></div>
+ <div class="roadEvents glass" id="roadEvents" aria-live="polite"><b><span class="eventGlyph">!</span> SEMÃFOROS / RADARES</b><span id="roadEventsText">Selecione uma rota para consultar os registros</span></div>
  <section class="sheet glass" id="sheet">
   <div class="grip" id="grip"></div>
   <div class="sheetContent" id="sheetContent">
    <div class="sheetTop"><div style="flex:1;min-width:0"><div class="overline" id="eyebrow">SEU PR&#211;XIMO DESTINO</div><div class="dest" id="destinationTitle">Explore sem limites.</div><div class="destAddress" id="destinationAddress">Mapa real, rotas inteligentes e estilo exclusivo.</div></div><div class="sheetTools"><button id="save" title="Salvar favorito">&#9734;</button><button id="expand" title="Recolher painel">&#8964;</button><button id="clear" title="Limpar">&#215;</button></div></div>
    <div class="maneuver" id="maneuver"><div class="turnSymbol" id="turnSymbol">&#8593;</div><div><div class="maneuverTitle" id="turnTitle">Siga em frente</div><div class="maneuverSub" id="turnSub">Aguardando posi&#231;&#227;o</div></div></div>
-   <div class="stats"><div class="stat"><label>â± Tempo estimado</label><strong id="eta">&#8212;</strong><small id="etaLabel">Selecione um destino</small></div><div class="stat"><label>ð£ Dist&#226;ncia</label><strong id="distance">&#8212;</strong><small>do percurso</small></div><div class="stat"><label>ð Chegada</label><strong id="arrival">&#8212;</strong><small>previs&#227;o</small></div></div>
-   <div class="actions"><button class="primary" id="start">&#9654; &nbsp;Iniciar navega&#231;&#227;o</button><button class="secondary" id="voice">&#128266; Voz</button><button class="secondary" id="share">&#8599;</button></div>
+   <div class="stats"><div class="stat"><label>TEMPO ESTIMADO</label><strong id="eta">&#8212;</strong><small id="etaLabel">Selecione um destino</small></div><div class="stat"><label>DIST&#194;NCIA</label><strong id="distance">&#8212;</strong><small>do percurso</small></div><div class="stat"><label>CHEGADA</label><strong id="arrival">&#8212;</strong><small>previs&#227;o</small></div></div>
+   <div class="actions"><button class="primary" id="start">&#9654; &nbsp;Iniciar navega&#231;&#227;o</button><button class="secondary" id="voice">Voz ligada</button><button class="secondary" id="share">&#8599;</button></div>
    <div class="routeList" id="routeList"></div>
-   <div class="stepsBlock" id="stepsBlock"><div class="sectionTitle">PR&#211;XIMAS MANOBRAS <small id="stepCount">0 etapas</small></div><div class="steps" id="steps"><div class="step"><b>&#129517;</b><div><strong>Pronto para come&#231;ar</strong><small>Pesquise um destino para calcular sua rota.</small></div></div></div></div>
+   <div class="stepsBlock" id="stepsBlock"><div class="sectionTitle">PR&#211;XIMAS MANOBRAS <small id="stepCount">0 etapas</small></div><div class="steps" id="steps"><div class="step"><b>&#9678;</b><div><strong>Pronto para come&#231;ar</strong><small>Pesquise um destino para calcular sua rota.</small></div></div></div></div>
    <div class="extraBlock"><div class="sectionTitle">TELEMETRIA <small>Informa&#231;&#245;es do aparelho</small></div><div class="extras"><div class="extra"><span>PRECIS&#195;O</span><strong id="accuracy">&#8212;</strong></div><div class="extra"><span>RUMO</span><strong id="direction">&#8212;</strong></div><div class="extra"><span>SITUA&#199;&#195;O</span><strong id="status">Aguardando</strong></div></div></div>
   </div>
-  <nav class="navbar"><button class="tab active" id="tabNavigate"><span>&#129517;</span>Navegar</button><button class="tab" id="tabRoutes"><span>&#128739;</span>Rotas</button><button class="tab" id="tabSaved"><span>&#9733;</span>Salvos</button><button class="tab" id="tabMap"><span>&#128506;</span>Mapa</button><button class="tab" id="tabSettings"><span>&#9881;</span>Mais</button></nav>
+  <nav class="navbar"><button class="tab active" id="tabNavigate"><span>&#9678;</span>Navegar</button><button class="tab" id="tabRoutes"><span>&#8594;</span>Rotas</button><button class="tab" id="tabSaved"><span>&#9733;</span>Salvos</button><button class="tab" id="tabMap"><span>&#9638;</span>Mapa</button><button class="tab" id="tabSettings"><span>&#9881;</span>Mais</button></nav>
  </section>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -202,8 +226,19 @@ function setSpeedUI(c,ts){
 }
 function carIcon(deg){
  const rotate=Number.isFinite(deg)?deg:0;
- return L.divIcon({className:'',html:'<div class="carMarker" style="transform:rotate('+rotate+'deg)">ð</div>',iconSize:[40,40],iconAnchor:[20,20]});
+ const carSVG=`<svg viewBox="0 0 64 76" width="50" height="60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+ <defs><linearGradient id="carPaint" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#56ecff"/><stop offset="1" stop-color="#0964ff"/></linearGradient></defs>
+ <ellipse cx="32" cy="68" rx="22" ry="6" fill="#001b45" opacity=".55"/>
+ <path d="M17 20 Q18 9 28 7 L36 7 Q46 9 47 20 L51 51 Q51 61 41 62 L23 62 Q13 61 13 51 Z" fill="url(#carPaint)" stroke="#fff" stroke-width="3.5"/>
+ <path d="M20 21 Q21 16 27 15 L37 15 Q43 16 44 21 L45 32 L19 32 Z" fill="#09254c" stroke="#a9efff" stroke-width="1.5"/>
+ <path d="M19 41 L45 41 L43 53 L21 53 Z" fill="#1d4b90" opacity=".8"/>
+ <path d="M10 43 L13 43 L13 54 L10 54 Z M51 43 L54 43 L54 54 L51 54 Z" fill="#081d33"/>
+ <path d="M18 12 L24 4 L40 4 L46 12" fill="none" stroke="#e8ffff" stroke-width="2" opacity=".8"/>
+ <rect x="18" y="53" width="8" height="4" rx="1.5" fill="#ff5f6b"/><rect x="38" y="53" width="8" height="4" rx="1.5" fill="#ff5f6b"/>
+ </svg>`;
+ return L.divIcon({className:'stanleyCarIcon',html:'<div class="carVehicle" style="transform:rotate('+rotate+'deg)">'+carSVG+'</div>',iconSize:[64,76],iconAnchor:[32,44]});
 }
+
 function projectNearRoute(lat,lon){
  const pts=routePoints();if(pts.length<2)return {distance:Infinity,ahead:Infinity};
  const pos={lat,lon};let nearest=Infinity,at=0,passed=0;
@@ -218,7 +253,7 @@ function projectNearRoute(lat,lon){
 async function loadRoadEvents(){
  const token=++latestEventQuery;eventMarkers.clearLayers();roadEventList=[];
  const pts=routePoints();if(pts.length<2){el('roadEventsText').textContent='Selecione uma rota para consultar';return}
- el('roadEventsText').textContent='Consultando dados abertos...';
+ el('roadEventsText').textContent='Verificando semÃ¡foros e radares cadastrados...';
  const lats=pts.map(p=>p[1]),lons=pts.map(p=>p[0]);
  let minLat=Math.min(...lats),maxLat=Math.max(...lats),minLon=Math.min(...lons),maxLon=Math.max(...lons);
  const delta=.007;minLat-=delta;maxLat+=delta;minLon-=delta;maxLon+=delta;
@@ -226,25 +261,36 @@ async function loadRoadEvents(){
  if((maxLat-minLat)*(maxLon-minLon)>.09){el('roadEventsText').textContent='Consulta indisponÃ­vel para rota extensa';return}
  const bbox=[minLat,minLon,maxLat,maxLon].map(n=>n.toFixed(5)).join(',');
  const query=`[out:json][timeout:12];(node["highway"="traffic_signals"](${bbox});node["highway"="speed_camera"](${bbox});node["enforcement"="maxspeed"](${bbox}););out body;`;
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),16000);
+ async function queryOverpass(endpoint,ms){
+   const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms);
+   try{
+     const resp=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:ctl.signal});
+     if(!resp.ok)throw Error('Servidor '+resp.status);
+     const result=await resp.json();
+     if(!Array.isArray(result.elements))throw Error('Dados inesperados');
+     return result;
+   }finally{clearTimeout(t)}
+ }
  try{
-   const resp=await fetch('https://overpass.private.coffee/api/interpreter',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:controller.signal});
-   if(!resp.ok)throw Error('Consulta indisponÃ­vel');const json=await resp.json();if(token!==latestEventQuery)return;
+   let json;
+   try{json=await queryOverpass('https://overpass.private.coffee/api/interpreter',8000)}
+   catch(e){if(token!==latestEventQuery)return;el('roadEventsText').textContent='Tentando segunda fonte de dados...';json=await queryOverpass('https://overpass.kumi.systems/api/interpreter',8000)}
+   if(token!==latestEventQuery)return;
    const unique=new Set();
    for(const item of json.elements||[]){
      if(!Number.isFinite(item.lat)||!Number.isFinite(item.lon))continue;
      const kind=item.tags?.highway==='traffic_signals'?'signal':'radar',key=kind+':'+item.id;
      if(unique.has(key))continue;unique.add(key);
      const near=projectNearRoute(item.lat,item.lon);if(near.distance>65)continue;
-     const marker=L.marker([item.lat,item.lon],{icon:L.divIcon({className:'',html:'<div class="poiMarker">'+(kind==='signal'?'ð¦':'ð·')+'</div>',iconSize:[30,30],iconAnchor:[15,15]})});
+     const marker=L.marker([item.lat,item.lon],{icon:L.divIcon({className:'',html:'<div class="poiMarker '+(kind==='signal'?'poiSignal':'poiRadar')+'">'+(kind==='signal'?'â<span>â</span><em>â</em>':'R')+'</div>',iconSize:[32,32],iconAnchor:[16,16]})});
      marker.bindPopup(kind==='signal'?'SemÃ¡foro cadastrado no OpenStreetMap':'Ponto de fiscalizaÃ§Ã£o cadastrado no OpenStreetMap â nÃ£o verificado');marker.addTo(eventMarkers);
      roadEventList.push({lat:item.lat,lon:item.lon,kind,routeProgress:near.ahead});
    }
    const signals=roadEventList.filter(x=>x.kind==='signal').length,radars=roadEventList.length-signals;
-   el('roadEventsText').textContent=signals+' semÃ¡foros Â· '+radars+' pontos de fiscalizaÃ§Ã£o (nÃ£o verificados)';
- }catch(e){if(token===latestEventQuery)el('roadEventsText').textContent='Sem dados de semÃ¡foros/radares nesta consulta';}
- finally{clearTimeout(timer)}
+   el('roadEventsText').textContent=(signals||radars)?(signals+' semÃ¡foros e '+radars+' pontos cadastrados prÃ³ximos da rota'):'Nenhum registro prÃ³ximo Ã  rota nesta base. Cobertura incompleta.';
+ }catch(e){if(token===latestEventQuery)el('roadEventsText').textContent='Consulta indisponÃ­vel. NÃ£o significa ausÃªncia de radares ou semÃ¡foros.';}
 }
+
 
 const coord=([lon,lat])=>[lat,lon];
 const formatDistance=n=>!Number.isFinite(n)?'\u2014':n<1000?Math.round(n)+' m':(n/1000).toFixed(1).replace('.',',')+' km';
@@ -312,7 +358,7 @@ function showResults(places,query){
  unique.slice(0,18).forEach((x,i)=>{
   const b=document.createElement('button');b.className='result'+(i===0?' primaryMatch':'');
   const a=document.createElement('strong'),d=document.createElement('small');
-  a.textContent=(i===0?'Melhor correspondÃªncia: ':'')+(x.name||'Destino');
+  a.textContent=(i===0?'1Âª correspondÃªncia: ':'')+(x.name||'Destino');
   d.textContent=(x.address||'Local encontrado')+' Â· '+(x.source||'Mapa');
   b.append(a,d);b.onclick=()=>setDestination(x);box.append(b)
  });
@@ -390,7 +436,7 @@ function setTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.tog
 el('tabNavigate').onclick=()=>{setTab('tabNavigate');el('sheet').classList.remove('collapsed')};
 el('tabRoutes').onclick=()=>{setTab('tabRoutes');if(!S.routes.length)toast('Pesquise um destino para visualizar rotas.');else{el('sheet').classList.remove('collapsed');el('routeList').scrollIntoView({behavior:'smooth',block:'nearest'})}};
 el('tabSaved').onclick=()=>{setTab('tabSaved');openSaved()};el('tabMap').onclick=()=>{setTab('tabMap');el('sheet').classList.add('collapsed');viewFullRoute()};
-el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.7: velocidade estimada pelo GPS, radar e semÃ¡foro somente quando cadastrados no OpenStreetMap. Dados incompletos.')};
+el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.8: velocidade estimada pelo GPS, radar e semÃ¡foro somente quando cadastrados no OpenStreetMap. Dados incompletos.')};
 map.on('dragstart',()=>{S.following=false});
 // Quando o nÃºmero nÃ£o existe no mapa, pressione por 1 segundo no ponto desejado.
 let pinPressTimer=null, pinPressStartedAt=0;
