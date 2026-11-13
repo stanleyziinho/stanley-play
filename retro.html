@@ -3,157 +3,141 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#130922">
-<title>STANLEY RETRO V4.0</title>
+<title>STANLEY RETRO V4.1</title>
 <style>
 *{box-sizing:border-box}
 body{
  margin:0;
- background:radial-gradient(circle at top right,#371367,#080611 65%);
  color:#fff;
  font-family:system-ui,-apple-system,Arial,sans-serif;
+ background:radial-gradient(circle at 85% 0%,#381365,#080611 62%);
+ min-height:100vh
 }
 main{max-width:1150px;margin:auto;padding:18px 14px 75px}
 a{color:#c8aaff;text-decoration:none}
-h1{font-size:clamp(29px,7vw,44px);margin:25px 0 4px}
-h1 span{color:#bd88ff}
+h1{font-size:clamp(28px,7vw,44px);margin:20px 0 6px}
+h1 span{color:#bb86ff}
 p{color:#c9b9dd;line-height:1.5}
 button,input,select{font:inherit}
 button{cursor:pointer}
-button:disabled{opacity:.5;cursor:not-allowed}
-.panel{
- background:#1b112c;
- border:1px solid #51337e;
- border-radius:20px;
- padding:17px;
- margin:20px 0;
-}
+button:disabled{opacity:.5}
 .hero{
- padding:25px 20px;
- border-radius:20px;
- background:linear-gradient(115deg,#50208d,#1a0c32);
+ padding:24px;
  border:1px solid #8244b9;
+ border-radius:22px;
+ background:linear-gradient(120deg,#54208d,#170b2b)
 }
-.hero p{margin-bottom:0}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0}
+.hero small{color:#e0c4ff}
+.panel{
+ margin:18px 0;
+ padding:17px;
+ border:1px solid #51337e;
+ border-radius:19px;
+ background:#1b112c
+}
+.tabs{display:flex;gap:8px;overflow-x:auto}
 .tabs button{
- background:#32204d;
- border:1px solid #63428b;
- color:#fff;
- border-radius:12px;
  padding:12px;
  white-space:nowrap;
+ border:1px solid #65438e;
+ border-radius:12px;
+ background:#32204d;
+ color:#fff
 }
 .tabs button.active{background:#8643df}
 .grid{
  display:grid;
  grid-template-columns:repeat(2,minmax(0,1fr));
- gap:13px;
+ gap:12px
 }
 .card{
- background:#211331;
- border:1px solid #50347a;
- border-radius:16px;
  overflow:hidden;
  min-width:0;
+ background:#211331;
+ border:1px solid #50347a;
+ border-radius:15px
 }
 .cover{
- height:160px;
- background:linear-gradient(135deg,#6834a7,#201035);
+ height:155px;
  display:flex;
  align-items:center;
  justify-content:center;
- font-size:60px;
- position:relative;
  overflow:hidden;
+ font-size:55px;
+ background:linear-gradient(135deg,#6734a5,#211035)
 }
-.cover img{
- width:100%;
- height:100%;
- object-fit:cover;
-}
+.cover img{width:100%;height:100%;object-fit:cover}
 .card-body{padding:12px}
-.card h3{font-size:15px;margin:0 0 7px;overflow-wrap:anywhere}
-.card p{font-size:12px;margin:0 0 10px}
-.badge{
- font-size:10px;
- padding:5px 9px;
- border-radius:20px;
- background:#503079;
- color:#ecddff;
+.card h3{font-size:15px;margin:5px 0 8px;overflow-wrap:anywhere}
+.card p{font-size:12px;margin:5px 0 10px}
+.tag{
  display:inline-block;
- margin-bottom:8px;
+ padding:5px 8px;
+ border-radius:20px;
+ font-size:10px;
+ background:#513179;
+ color:#efdcff
 }
 .btn{
  display:inline-block;
+ width:auto;
+ padding:12px 14px;
  border:0;
- background:#8742e5;
- color:#fff;
  border-radius:11px;
- padding:12px;
+ background:#8541e1;
+ color:#fff;
  font-size:13px;
  font-weight:700;
- text-align:center;
- text-decoration:none;
+ text-align:center
 }
-.card .btn{width:100%;margin-top:6px}
-.secondary{background:#402857}
-.danger{background:#633047}
-label{display:block;margin:14px 0 7px;font-weight:650}
+.card .btn{width:100%;margin:4px 0}
+.secondary{background:#412759}
+.danger{background:#603044}
+label{display:block;margin:13px 0 7px;font-weight:650}
 input,select{
- display:block;
  width:100%;
- background:#2c1b44;
- color:white;
+ padding:13px;
  border:1px solid #7850af;
  border-radius:12px;
- padding:13px;
- font-size:16px;
+ background:#2c1b44;
+ color:#fff;
+ font-size:16px
 }
 input[type=file]{font-size:13px}
 .preview{
- margin-top:12px;
  width:130px;
  height:165px;
- background:#28183d;
- border:1px dashed #7955b2;
- border-radius:13px;
+ margin-top:12px;
  display:flex;
  align-items:center;
  justify-content:center;
- font-size:40px;
  overflow:hidden;
+ border:1px dashed #825ab3;
+ border-radius:12px;
+ background:#29183e;
+ font-size:42px
 }
 .preview img{width:100%;height:100%;object-fit:cover}
 .notice{
- background:#2a1b3d;
- border-left:3px solid #a76bfa;
  padding:12px;
- border-radius:9px;
- font-size:12px;
+ background:#291a3c;
+ border-left:3px solid #a66cf9;
+ border-radius:8px;
+ font-size:12px
 }
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.counter{font-size:12px;color:#c9aeef}
-#status{font-size:13px;min-height:18px}
-#player{display:none}
-#game{
- background:#050309;
- width:100%;
- height:min(72vh,560px);
- min-height:300px;
- border-radius:14px;
- overflow:hidden;
-}
-.hidden{display:none!important}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .empty{
  grid-column:1/-1;
  padding:25px;
+ border-radius:14px;
+ background:#28183d;
  text-align:center;
- background:#251739;
- border-radius:15px;
- color:#bdafd0;
+ color:#d2c0e9
 }
+#status{font-size:13px;min-height:20px}
+[hidden]{display:none!important}
 @media(min-width:700px){
  .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
  .cover{height:190px}
@@ -162,15 +146,14 @@ input[type=file]{font-size:13px}
 </head>
 <body>
 <main>
+<a href="./index.html">← STANLEY PLAY</a>
 
-<a href="./index.html">← Voltar ao STANLEY PLAY</a>
-
-<div class="hero">
+<header class="hero">
 <h1>STANLEY <span>RETRO</span></h1>
 <strong>🎮 SUA CENTRAL DE JOGOS</strong>
-<p>Jogos clássicos, biblioteca pessoal e capas personalizadas.</p>
-<small>VERSÃO 4.0 • ROXO GAMER</small>
-</div>
+<p>Biblioteca, capas personalizadas e player otimizado.</p>
+<small>VERSÃO 4.1 • MODO DESEMPENHO</small>
+</header>
 
 <section class="panel">
 <div class="tabs">
@@ -181,34 +164,32 @@ input[type=file]{font-size:13px}
 </section>
 
 <section class="panel" id="minePanel">
-<div class="row" style="justify-content:space-between">
+<div class="row">
 <h2>🎮 Minha Biblioteca</h2>
-<span class="counter" id="count">0 jogos</span>
+<span id="count" class="tag">0 jogos</span>
 </div>
-<p>Seus jogos ficam salvos neste dispositivo. Escolha uma capa e jogue quando quiser.</p>
+<p>Escolha um jogo. O emulador será aberto em uma página separada.</p>
 <div id="library" class="grid"></div>
 </section>
 
 <section class="panel" id="officialPanel" hidden>
-<h2>⭐ Biblioteca Oficial STANLEY PLAY</h2>
-<p>Jogos autorizados, disponíveis diretamente para todos os usuários.</p>
+<h2>⭐ Biblioteca Oficial</h2>
+<p>Espaço reservado aos jogos com autorização para distribuição pública.</p>
 <div id="officialLibrary" class="grid"></div>
-<p class="notice">
-A biblioteca oficial receberá somente jogos cuja licença permita hospedagem e distribuição. Os jogos comerciais não estão incluídos.
-</p>
+<p class="notice">As ROMs particulares salvas no seu iPhone não são compartilhadas com os demais usuários.</p>
 </section>
 
 <section class="panel" id="sitesPanel" hidden>
-<h2>🌐 Encontrar Jogos por Console</h2>
-<p>Explore páginas de desenvolvedores de jogos homebrew e confira as permissões de cada download.</p>
+<h2>🌐 Encontrar jogos por console</h2>
+<p>Encontre jogos homebrew nos sites de seus criadores.</p>
 <div id="sites" class="grid"></div>
 </section>
 
 <section class="panel" id="addPanel">
-<h2>➕ Adicionar jogo à biblioteca</h2>
+<h2>➕ Adicionar jogo</h2>
 
 <label for="title">Nome do jogo</label>
-<input id="title" placeholder="Nome do seu jogo" maxlength="100">
+<input id="title" maxlength="100" placeholder="Nome do jogo">
 
 <label for="core">Console</label>
 <select id="core">
@@ -223,37 +204,25 @@ A biblioteca oficial receberá somente jogos cuja licença permita hospedagem e 
 <option value="psp">PSP (experimental)</option>
 </select>
 
-<label for="rom">Selecionar ROM</label>
+<label for="rom">Arquivo do jogo (ROM)</label>
 <input id="rom" type="file">
 
-<label for="coverInput">🖼 Escolher capa do jogo</label>
+<label for="coverInput">Imagem de capa</label>
 <input id="coverInput" type="file" accept="image/png,image/jpeg,image/webp">
-
 <div class="preview" id="coverPreview">🎮</div>
 
 <label for="bios">BIOS, quando necessária</label>
 <input id="bios" type="file">
 
 <p class="notice">
-A imagem será redimensionada para economizar espaço. ROMs e capas serão armazenadas no navegador deste dispositivo. Mantenha cópias originais dos arquivos, pois os dados do Safari podem ser removidos.
+ROMs de Nintendo 64 e PlayStation 1 podem exigir mais memória.
+PSP ainda não está habilitado nesta hospedagem.
+Use somente jogos e BIOS que você tenha direito de utilizar.
 </p>
 
-<button class="btn" id="save">💾 Salvar jogo e capa</button>
+<button class="btn" id="save">💾 Salvar na Biblioteca</button>
 <p id="status" role="status"></p>
 </section>
-
-<section class="panel" id="player">
-<div class="row">
-<button class="btn secondary" id="back">← Biblioteca</button>
-<button class="btn secondary" id="full">⛶ Tela cheia</button>
-</div>
-<h2 id="playing">Jogo</h2>
-<div id="game"></div>
-<p class="notice">
-Emulador EmulatorJS. Use os controles virtuais ou um controle compatível. A primeira execução precisa de internet.
-</p>
-</section>
-
 </main>
 
 <script>
@@ -307,35 +276,18 @@ const consoles={
  }
 };
 
-/*
- BIBLIOTECA OFICIAL
- Adicionar somente ROMs com autorização
- de distribuição pública.
-
- Exemplo de estrutura:
- {
-  title:"Nome do jogo",
-  core:"nes",
-  rom:"./roms/nome-do-jogo.nes",
-  cover:"./covers/nome-do-jogo.webp"
- }
-
- O exemplo acima não é um jogo incluído.
-*/
+/* Jogos oficiais serão adicionados
+   após verificação das licenças. */
 const officialGames=[];
 
+/* Banco IDÊNTICO ao da V3 e V4 */
 let database;
-let activeRomURL=null;
-let activeBiosURL=null;
-let coverUrls=[];
-
-const dbOpen=new Promise((resolve,reject)=>{
+const dbReady=new Promise((resolve,reject)=>{
  const req=indexedDB.open("stanley-retro-v3",1);
 
  req.onupgradeneeded=()=>{
-  const db=req.result;
-  if(!db.objectStoreNames.contains("roms")){
-   db.createObjectStore("roms",{
+  if(!req.result.objectStoreNames.contains("roms")){
+   req.result.createObjectStore("roms",{
     keyPath:"id",
     autoIncrement:true
    });
@@ -352,255 +304,211 @@ const dbOpen=new Promise((resolve,reject)=>{
 function store(mode){
  return database.transaction("roms",mode).objectStore("roms");
 }
-
-async function allGames(){
- await dbOpen;
+async function getAll(){
+ await dbReady;
  return new Promise((resolve,reject)=>{
-  const q=store("readonly").getAll();
-  q.onsuccess=()=>resolve(q.result);
-  q.onerror=()=>reject(q.error);
+  const req=store("readonly").getAll();
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
  });
 }
-
-async function getGame(id){
- await dbOpen;
+async function getOne(id){
+ await dbReady;
  return new Promise((resolve,reject)=>{
-  const q=store("readonly").get(id);
-  q.onsuccess=()=>resolve(q.result);
-  q.onerror=()=>reject(q.error);
+  const req=store("readonly").get(id);
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
  });
 }
-
-async function putGame(item){
- await dbOpen;
+async function putOne(data){
+ await dbReady;
  return new Promise((resolve,reject)=>{
-  const q=store("readwrite").put(item);
-  q.onsuccess=()=>resolve(q.result);
-  q.onerror=()=>reject(q.error);
+  const req=store("readwrite").put(data);
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
  });
 }
-
-async function deleteGame(id){
- await dbOpen;
+async function removeOne(id){
+ await dbReady;
  return new Promise((resolve,reject)=>{
-  const q=store("readwrite").delete(id);
-  q.onsuccess=()=>resolve();
-  q.onerror=()=>reject(q.error);
+  const req=store("readwrite").delete(id);
+  req.onsuccess=()=>resolve();
+  req.onerror=()=>reject(req.error);
  });
 }
 
 async function compressCover(file){
  if(!file)return null;
- if(!file.type.startsWith("image/")){
-  throw Error("Escolha uma imagem válida.");
- }
- return new Promise((resolve,reject)=>{
-  const url=URL.createObjectURL(file);
+ if(!file.type.startsWith("image/"))throw Error("Imagem inválida.");
+
+ const url=URL.createObjectURL(file);
+
+ try{
   const image=new Image();
+  await new Promise((resolve,reject)=>{
+   image.onload=resolve;
+   image.onerror=()=>reject(Error("Falha ao abrir imagem."));
+   image.src=url;
+  });
 
-  image.onload=()=>{
-   try{
-    const canvas=document.createElement("canvas");
-    const max=600;
-    const scale=Math.min(1,max/Math.max(image.width,image.height));
-    canvas.width=Math.max(1,Math.round(image.width*scale));
-    canvas.height=Math.max(1,Math.round(image.height*scale));
+  const scale=Math.min(1,480/Math.max(image.width,image.height));
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.max(1,Math.round(image.width*scale));
+  canvas.height=Math.max(1,Math.round(image.height*scale));
+  canvas.getContext("2d").drawImage(
+   image,0,0,canvas.width,canvas.height
+  );
 
-    const ctx=canvas.getContext("2d");
-    ctx.drawImage(image,0,0,canvas.width,canvas.height);
+  return await new Promise((resolve,reject)=>{
+   canvas.toBlob(blob=>{
+    if(blob)resolve(blob);
+    else reject(Error("Falha ao gerar capa."));
+   },"image/jpeg",0.7);
+  });
+ }finally{
+  URL.revokeObjectURL(url);
+ }
+}
 
-    canvas.toBlob(blob=>{
-     URL.revokeObjectURL(url);
-     if(blob)resolve(blob);
-     else reject(Error("Erro ao processar capa."));
-    },"image/jpeg",0.78);
-   }catch(e){
-    URL.revokeObjectURL(url);
-    reject(e);
-   }
-  };
-
-  image.onerror=()=>{
-   URL.revokeObjectURL(url);
-   reject(Error("Não foi possível abrir a imagem."));
-  };
-
-  image.src=url;
- });
+let imageUrls=[];
+function cleanupImages(){
+ imageUrls.forEach(u=>URL.revokeObjectURL(u));
+ imageUrls=[];
 }
 
 function makeCover(container,cover,emoji){
- const art=document.createElement("div");
- art.className="cover";
-
+ const div=document.createElement("div");
+ div.className="cover";
  if(cover){
-  const img=document.createElement("img");
-  img.alt="Capa do jogo";
-
+  const image=document.createElement("img");
+  image.alt="Capa do jogo";
   if(typeof cover==="string"){
-   img.src=cover;
+   image.src=cover;
   }else{
    const url=URL.createObjectURL(cover);
-   coverUrls.push(url);
-   img.src=url;
+   imageUrls.push(url);
+   image.src=url;
   }
-
-  art.append(img);
+  div.append(image);
  }else{
-  art.textContent=emoji||"🎮";
+  div.textContent=emoji||"🎮";
  }
- container.append(art);
+ container.append(div);
 }
 
-function clearCoverUrls(){
- coverUrls.forEach(url=>URL.revokeObjectURL(url));
- coverUrls=[];
+let opening=false;
+
+function playGame(id){
+ if(opening)return;
+ opening=true;
+ const idNumber=Number(id);
+
+ if(!Number.isSafeInteger(idNumber)){
+  opening=false;
+  return;
+ }
+
+ const url="./player.html?id="+encodeURIComponent(idNumber);
+ location.assign(url);
 }
 
 async function renderLibrary(){
  try{
-  const games=await allGames();
-  $("count").textContent=games.length+" jogo(s)";
-  const container=$("library");
+  const games=await getAll();
+  const target=$("library");
+  target.replaceChildren();
+  cleanupImages();
 
-  container.replaceChildren();
-  clearCoverUrls();
+  $("count").textContent=games.length+" jogo(s)";
 
   if(!games.length){
-   const empty=document.createElement("div");
-   empty.className="empty";
-   empty.textContent="Sua biblioteca está vazia. Adicione uma ROM abaixo.";
-   container.append(empty);
+   const message=document.createElement("div");
+   message.className="empty";
+   message.textContent="Sua biblioteca está vazia. Adicione seu primeiro jogo.";
+   target.append(message);
    return;
   }
 
   for(const g of games){
-   const c=consoles[g.core];
-   if(!c)continue;
+   const consoleInfo=consoles[g.core];
+   if(!consoleInfo)continue;
 
    const card=document.createElement("article");
    card.className="card";
-
-   makeCover(card,g.cover,c.emoji);
+   makeCover(card,g.cover,consoleInfo.emoji);
 
    const body=document.createElement("div");
    body.className="card-body";
 
-   const badge=document.createElement("span");
-   badge.className="badge";
-   badge.textContent=c.name;
+   const tag=document.createElement("span");
+   tag.className="tag";
+   tag.textContent=consoleInfo.name;
 
    const title=document.createElement("h3");
    title.textContent=g.title;
 
    const size=document.createElement("p");
-   size.textContent=(g.rom.size/1048576).toFixed(1)+" MB";
+   size.textContent=g.rom&&g.rom.size
+    ?(g.rom.size/1048576).toFixed(1)+" MB"
+    :"Tamanho desconhecido";
 
    const play=document.createElement("button");
    play.className="btn";
    play.textContent="▶ JOGAR";
-   play.onclick=()=>launch(g.id);
+   play.onclick=()=>playGame(g.id);
 
-   const coverButton=document.createElement("button");
-   coverButton.className="btn secondary";
-   coverButton.textContent="🖼 Alterar capa";
-
-   coverButton.onclick=()=>{
+   const coverBtn=document.createElement("button");
+   coverBtn.className="btn secondary";
+   coverBtn.textContent="🖼 Alterar capa";
+   coverBtn.onclick=()=>{
     const input=document.createElement("input");
     input.type="file";
     input.accept="image/png,image/jpeg,image/webp";
-
     input.onchange=async()=>{
-     const file=input.files[0];
-     if(!file)return;
-
+     if(!input.files.length)return;
+     coverBtn.disabled=true;
      try{
-      const updated=await getGame(g.id);
-      updated.cover=await compressCover(file);
-      await putGame(updated);
+      const item=await getOne(g.id);
+      item.cover=await compressCover(input.files[0]);
+      await putOne(item);
       await renderLibrary();
      }catch(e){
-      alert("Erro ao atualizar capa: "+e.message);
+      alert("Falha ao salvar capa: "+e.message);
+      coverBtn.disabled=false;
      }
     };
-
     input.click();
    };
 
-   const remove=document.createElement("button");
-   remove.className="btn danger";
-   remove.textContent="Excluir jogo";
-
-   remove.onclick=async()=>{
-    if(!confirm("Excluir "+g.title+" deste aparelho?"))return;
-
+   const del=document.createElement("button");
+   del.className="btn danger";
+   del.textContent="Excluir jogo";
+   del.onclick=async()=>{
+    if(!confirm("Excluir "+g.title+" deste dispositivo?"))return;
     try{
-     await deleteGame(g.id);
+     await removeOne(g.id);
      await renderLibrary();
     }catch(e){
-     alert("Erro ao excluir: "+e.message);
+     alert("Falha ao excluir: "+e.message);
     }
    };
 
-   body.append(badge,title,size,play,coverButton,remove);
+   body.append(tag,title,size,play,coverBtn,del);
    card.append(body);
-   container.append(card);
+   target.append(card);
   }
-
  }catch(e){
-  $("status").textContent="Erro ao carregar biblioteca: "+e.message;
+  $("status").textContent="Falha ao ler biblioteca: "+e.message;
  }
-}
-
-function renderOfficial(){
- const el=$("officialLibrary");
- el.replaceChildren();
-
- if(!officialGames.length){
-  const empty=document.createElement("div");
-  empty.className="empty";
-  empty.textContent="Em preparação: jogos autorizados ainda não foram adicionados à biblioteca oficial.";
-  el.append(empty);
-  return;
- }
-
- officialGames.forEach(g=>{
-  const c=consoles[g.core];
-  if(!c)return;
-
-  const card=document.createElement("article");
-  card.className="card";
-
-  makeCover(card,g.cover,c.emoji);
-
-  const body=document.createElement("div");
-  body.className="card-body";
-
-  const title=document.createElement("h3");
-  title.textContent=g.title;
-
-  const label=document.createElement("p");
-  label.textContent=c.name;
-
-  const play=document.createElement("button");
-  play.className="btn";
-  play.textContent="▶ JOGAR";
-  play.onclick=()=>launchOfficial(g);
-
-  body.append(title,label,play);
-  card.append(body);
-  el.append(card);
- });
 }
 
 function renderSites(){
- const el=$("sites");
- el.replaceChildren();
+ const target=$("sites");
+ target.replaceChildren();
 
- for(const c of Object.values(consoles)){
+ Object.values(consoles).forEach(c=>{
   const card=document.createElement("article");
   card.className="card";
-
   makeCover(card,null,c.emoji);
 
   const body=document.createElement("div");
@@ -611,23 +519,62 @@ function renderSites(){
 
   const link=document.createElement("a");
   link.className="btn";
+  link.textContent="Encontrar jogos ↗";
   link.href=c.link;
   link.target="_blank";
   link.rel="noopener noreferrer";
-  link.textContent="Encontrar jogos ↗";
 
   body.append(title,link);
   card.append(body);
-  el.append(card);
+  target.append(card);
+ });
+}
+
+function renderOfficial(){
+ const target=$("officialLibrary");
+ target.replaceChildren();
+
+ if(!officialGames.length){
+  const div=document.createElement("div");
+  div.className="empty";
+  div.textContent="Biblioteca oficial em preparação. Nenhuma ROM pública foi adicionada ainda.";
+  target.append(div);
+  return;
+ }
+
+ for(const game of officialGames){
+  const c=consoles[game.core];
+  if(!c)continue;
+
+  const card=document.createElement("article");
+  card.className="card";
+  makeCover(card,game.cover,c.emoji);
+
+  const body=document.createElement("div");
+  body.className="card-body";
+  const title=document.createElement("h3");
+  title.textContent=game.title;
+
+  const button=document.createElement("button");
+  button.className="btn";
+  button.textContent="▶ JOGAR";
+  button.onclick=()=>{
+   alert("Os jogos oficiais serão ativados após validação das licenças.");
+  };
+
+  body.append(title,button);
+  card.append(body);
+  target.append(card);
  }
 }
 
 function showTab(tab){
  const names=["mine","official","sites"];
- for(const name of names){
-  $(name+"Panel").hidden=name!==tab;
-  const button=$("tab"+name[0].toUpperCase()+name.slice(1));
-  button.classList.toggle("active",name===tab);
+
+ for(const n of names){
+  $(n+"Panel").hidden=n!==tab;
+  const btn=$("tab"+n[0].toUpperCase()+n.slice(1));
+  btn.classList.toggle("active",n===tab);
  }
  $("addPanel").hidden=tab!=="mine";
 }
@@ -638,30 +585,31 @@ $("tabSites").onclick=()=>showTab("sites");
 
 let previewURL=null;
 
-$("coverInput").addEventListener("change",()=>{
- const file=$("coverInput").files[0];
+$("coverInput").onchange=()=>{
+ const input=$("coverInput");
  const preview=$("coverPreview");
 
  if(previewURL)URL.revokeObjectURL(previewURL);
  previewURL=null;
  preview.replaceChildren();
 
- if(!file){
+ if(!input.files.length){
   preview.textContent="🎮";
   return;
  }
 
+ const file=input.files[0];
  if(!file.type.startsWith("image/")){
   preview.textContent="Imagem inválida";
   return;
  }
 
  previewURL=URL.createObjectURL(file);
- const img=document.createElement("img");
- img.src=previewURL;
- img.alt="Prévia da capa";
- preview.append(img);
-});
+ const image=document.createElement("img");
+ image.src=previewURL;
+ image.alt="Prévia";
+ preview.append(image);
+};
 
 $("save").onclick=async()=>{
  const file=$("rom").files[0];
@@ -674,28 +622,25 @@ $("save").onclick=async()=>{
  }
 
  const ext=file.name.split(".").pop().toLowerCase();
-
  if(!c.ext.includes(ext)){
-  $("status").textContent="Formato incompatível com o console selecionado.";
+  $("status").textContent="Extensão incompatível com o console escolhido.";
   return;
  }
 
  if(file.size>300*1048576){
-  if(!confirm("ROM grande: o Safari pode não conseguir armazenar. Continuar?"))return;
+  if(!confirm("Arquivo muito grande. Pode falhar no Safari. Continuar?"))return;
  }
 
- $("save").disabled=true;
- $("status").textContent="Salvando jogo e capa...";
+ const button=$("save");
+ button.disabled=true;
+ $("status").textContent="Salvando ROM e capa...";
 
  try{
   const coverFile=$("coverInput").files[0];
   const cover=coverFile?await compressCover(coverFile):null;
 
-  const title=$("title").value.trim()||
-    file.name.replace(/\.[^.]+$/,"");
-
-  await putGame({
-   title,
+  await putOne({
+   title:$("title").value.trim()||file.name.replace(/\.[^.]+$/,""),
    core,
    rom:file,
    bios:$("bios").files[0]||null,
@@ -703,8 +648,7 @@ $("save").onclick=async()=>{
    created:Date.now()
   });
 
-  $("status").textContent="✅ Jogo e capa salvos com sucesso!";
-
+  $("status").textContent="✅ Jogo salvo com sucesso!";
   $("title").value="";
   $("rom").value="";
   $("bios").value="";
@@ -717,108 +661,21 @@ $("save").onclick=async()=>{
   }
 
   await renderLibrary();
-
  }catch(e){
   $("status").textContent="Erro ao salvar: "+e.message;
  }finally{
-  $("save").disabled=false;
+  button.disabled=false;
  }
 };
 
-function setupPlayer(title,core,romURL,biosURL){
- $("minePanel").hidden=true;
- $("officialPanel").hidden=true;
- $("sitesPanel").hidden=true;
- $("addPanel").hidden=true;
+window.addEventListener("pageshow",()=>{
+ opening=false;
+});
 
- $("player").style.display="block";
- $("playing").textContent=title;
-
- window.EJS_player="#game";
- window.EJS_core=core;
- window.EJS_gameUrl=romURL;
- window.EJS_gameName=title;
- window.EJS_biosUrl=biosURL||"";
- window.EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/";
- window.EJS_color="#8b5cf6";
- window.EJS_volume=0.65;
- window.EJS_startOnLoaded=true;
- window.EJS_threads=false;
-
- const loader=document.createElement("script");
- loader.src="https://cdn.emulatorjs.org/stable/data/loader.js";
-
- loader.onerror=()=>{
-  alert("Não foi possível carregar o EmulatorJS. Verifique sua conexão.");
- };
-
- document.body.append(loader);
- $("player").scrollIntoView({behavior:"smooth"});
-}
-
-async function launch(id){
- try{
-  const g=await getGame(id);
-  if(!g)return;
-
-  if(g.core==="psp"){
-   alert("PSP requer recursos adicionais de hospedagem. Este modo ainda não está habilitado.");
-   return;
-  }
-
-  if(g.core==="psx"&&!g.bios){
-   if(!confirm("O PlayStation 1 pode precisar de uma BIOS própria. Continuar?"))return;
-  }
-
-  activeRomURL=URL.createObjectURL(g.rom);
-  activeBiosURL=g.bios?URL.createObjectURL(g.bios):null;
-
-  setupPlayer(g.title,g.core,activeRomURL,activeBiosURL);
-
- }catch(e){
-  alert("Erro ao abrir jogo: "+e.message);
- }
-}
-
-function launchOfficial(g){
- if(!g.rom){
-  alert("Este jogo ainda não está disponível.");
-  return;
- }
- if(g.core==="psp"){
-  alert("PSP ainda não está habilitado nesta hospedagem.");
-  return;
- }
- setupPlayer(g.title,g.core,g.rom,g.bios||null);
-}
-
-function release(){
- if(activeRomURL){
-  URL.revokeObjectURL(activeRomURL);
-  activeRomURL=null;
- }
- if(activeBiosURL){
-  URL.revokeObjectURL(activeBiosURL);
-  activeBiosURL=null;
- }
- clearCoverUrls();
+window.addEventListener("pagehide",()=>{
+ cleanupImages();
  if(previewURL)URL.revokeObjectURL(previewURL);
-}
-
-$("back").onclick=()=>location.reload();
-
-$("full").onclick=()=>{
- const el=$("game");
- if(el.requestFullscreen){
-  el.requestFullscreen().catch(()=>{
-   alert("Tela cheia não disponível neste navegador.");
-  });
- }else{
-  alert("Use o botão de tela cheia do próprio emulador.");
- }
-};
-
-window.addEventListener("pagehide",release);
+});
 
 renderSites();
 renderOfficial();
