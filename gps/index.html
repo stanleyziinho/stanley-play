@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#050c19"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>STANLEY GPS ULTRA | V3.1</title>
+<title>STANLEY GPS ULTRA | V3.2</title>
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22STANLEY%20GPS%20ULTRA%22%2C%22short_name%22%3A%22STANLEY%20GPS%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%2F%22%2C%22background_color%22%3A%22%23050c19%22%2C%22theme_color%22%3A%22%23050c19%22%7D">
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoWBrh0Dk7BUdo=" crossorigin="">
 <style>
@@ -22,6 +22,11 @@
 .myDot{width:22px;height:22px;border-radius:50%;background:#1ccfff;border:4px solid white;box-shadow:0 0 0 10px #00bfff26,0 0 22px #00beff99}.pin{font-size:30px;filter:drop-shadow(0 4px 9px #000)}
 @media(max-height:720px){.hud{top:calc(var(--safeT) + 187px)}.side{top:calc(var(--safeT) + 187px)}.sheet{max-height:65dvh}.quick{display:none}.driving .sheet{max-height:350px}}
 @media(max-width:350px){.sheet{gap:7px;padding:8px}.stats{gap:5px}.stat{padding:8px 5px}.stat strong{font-size:17px}.stat:first-child strong{font-size:20px}.brand{font-size:12px}.signal{font-size:9px}.quick button{padding:8px}.hud{left:8px}.side{right:8px}}
+
+/* As imagens dos mosaicos nÃ£o podem ser redimensionadas pelo tema ou animaÃ§Ãµes. */
+.leaflet-tile{filter:none!important;max-width:none!important;max-height:none!important}
+.leaflet-map-pane,.leaflet-tile-pane{will-change:auto}
+@supports (height:100dvh){#map,.app{height:100dvh;bottom:auto}}
 </style>
 </head>
 <body>
@@ -58,9 +63,36 @@ const settingsKey='stanley-gps-v3-saved';
 let saved={home:null,work:null,favorites:[]};
 try{saved={...saved,...JSON.parse(localStorage.getItem(settingsKey)||'{}')}}catch{}
 const S={position:null,destination:null,routes:[],selected:0,running:false,voice:true,watch:null,following:true,style:0,request:0,searchRequest:null,lastVoice:-1,lastReroute:0,lastRecalc:0,offRoute:false};
-const map=L.map('map',{zoomControl:false,preferCanvas:true}).setView([-19.9167,-43.9345],13);
-const layers=[{url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors'},{url:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors, HOT'},{url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors'}];
-let tiles=L.tileLayer(layers[0].url,{attribution:layers[0].credit,maxZoom:19}).addTo(map);
+const map=L.map('map',{zoomControl:false,preferCanvas:true,fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false}).setView([-19.9167,-43.9345],13);
+// Fontes abertas sem uso de tiles comerciais que exigem chave de API.
+const layers=[
+ {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors',name:'Ruas'},
+ {url:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',credit:'&copy; OpenStreetMap contributors, HOT',name:'Detalhado'}
+];
+let tiles;
+let tileErrorCount=0;
+function mountTiles(index=0){
+  if(tiles)map.removeLayer(tiles);
+  tileErrorCount=0;
+  S.style=index;
+  tiles=L.tileLayer(layers[index].url,{
+    attribution:layers[index].credit,maxNativeZoom:19,maxZoom:19,minZoom:3,
+    updateWhenIdle:true,keepBuffer:5,crossOrigin:false,
+    errorTileUrl:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#dfe9e3"/><path d="M0 128H256M128 0V256" stroke="#bdcfc6" stroke-width="2"/></svg>')
+  }).addTo(map);
+  tiles.on('tileerror',()=>{
+    if(++tileErrorCount===4)toast('Alguns trechos do mapa nÃ£o carregaram. Verifique a internet ou troque o tipo de mapa.');
+  });
+  map.invalidateSize({pan:false});
+}
+mountTiles(0);
+// Corrige dimensÃµes de mosaicos em Safari quando a barra do navegador muda de tamanho.
+let resizeHandle;
+function repairMap(){clearTimeout(resizeHandle);resizeHandle=setTimeout(()=>map.invalidateSize({pan:false}),100)}
+window.addEventListener('resize',repairMap);
+window.addEventListener('orientationchange',()=>setTimeout(repairMap,350));
+window.addEventListener('pageshow',repairMap);
+window.visualViewport?.addEventListener('resize',repairMap);
 let userMarker=null,accuracyCircle=null,destMarker=null,routeLines=[];
 const coord=([lon,lat])=>[lat,lon];
 const formatDistance=n=>!Number.isFinite(n)?'\u2014':n<1000?Math.round(n)+' m':(n/1000).toFixed(1).replace('.',',')+' km';
@@ -90,21 +122,52 @@ function gps(){
    const ll=[c.latitude,c.longitude];
    if(!userMarker){userMarker=L.marker(ll,{zIndexOffset:1500,icon:L.divIcon({className:'',html:'<div class="myDot"></div>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map);accuracyCircle=L.circle(ll,{radius:c.accuracy,color:'#32d8ff',fillColor:'#32d8ff',fillOpacity:.07,weight:1}).addTo(map);if(!S.destination)map.setView(ll,16)}
    else{userMarker.setLatLng(ll);accuracyCircle.setLatLng(ll).setRadius(c.accuracy)}
-   if(S.following){if(S.running)map.panTo(ll,{animate:true});else if(!S.destination)map.panTo(ll,{animate:true})}
+   if(S.following){if(S.running)map.panTo(ll,{animate:false});else if(!S.destination)map.panTo(ll,{animate:false})}
    if(S.destination&&!S.routes.length)routeTo();
    if(S.running&&S.routes.length)updateGuidance();
  },e=>{S.watch=null;gpsUI(false,'GPS INDISPON\u00cdVEL');toast(e.code===1?'Permita a localiza\u00e7\u00e3o nas configura\u00e7\u00f5es do navegador.':'N\u00e3o foi poss\u00edvel obter o sinal de GPS.');},{enableHighAccuracy:true,maximumAge:1000,timeout:13000});
 }
+function photonPlace(f){
+ const p=f.properties||{},coordinates=f.geometry?.coordinates;
+ if(!coordinates||coordinates.length<2)return null;
+ const name=[p.name,p.housenumber].filter(Boolean).join(', ')||[p.street,p.housenumber].filter(Boolean).join(', ')||p.city||'Local';
+ const address=[p.street,p.housenumber,p.district,p.city,p.state,p.country].filter(Boolean).join(', ');
+ return {lat:coordinates[1],lon:coordinates[0],name,address:address||name};
+}
+function showResults(places){
+ const box=el('results');box.replaceChildren();
+ if(!places.length){box.innerHTML='<div class="resultsHint">Nenhum endereÃ§o encontrado. Tente rua + nÃºmero + cidade, ou pesquise um ponto de referÃªncia.</div>';return}
+ const seen=new Set();
+ places.forEach(x=>{
+  if(!x||!Number.isFinite(+x.lat)||!Number.isFinite(+x.lon))return;
+  const key=(+x.lat).toFixed(5)+','+(+x.lon).toFixed(5);if(seen.has(key))return;seen.add(key);
+  const b=document.createElement('button');b.className='result';b.setAttribute('role','option');
+  const a=document.createElement('strong'),d=document.createElement('small');a.textContent=x.name||'Destino';d.textContent=x.address||'Local encontrado';
+  b.append(a,d);b.onclick=()=>setDestination(x);box.append(b)
+ });
+}
 async function lookup(){
- const q=el('search').value.trim();if(q.length<3){toast('Digite ao menos 3 caracteres para pesquisar.');return}
- if(S.searchRequest)S.searchRequest.abort();S.searchRequest=new AbortController();
- const box=el('results');box.style.display='block';box.innerHTML='<div class="resultsHint">Pesquisando lugares...</div>';
+ const q=el('search').value.trim();
+ if(q.length<3){toast('Digite ao menos 3 caracteres para pesquisar.');return}
+ if(S.searchRequest)S.searchRequest.abort();
+ S.searchRequest=new AbortController();const signal=S.searchRequest.signal;
+ const box=el('results');box.style.display='block';box.innerHTML='<div class="resultsHint">Buscando ruas, nÃºmeros e estabelecimentos...</div>';
+ const params=new URLSearchParams({q,limit:'12',lang:'pt'});
+ if(S.position){params.set('lat',String(S.position.lat));params.set('lon',String(S.position.lon))}
  try{
-  const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=7&addressdetails=1&q='+encodeURIComponent(q),{signal:S.searchRequest.signal,headers:{'Accept-Language':'pt-BR,pt'}});
-  if(!r.ok)throw Error('busca');const data=await r.json();box.replaceChildren();
-  if(!data.length){box.innerHTML='<div class="resultsHint">Nenhum resultado. Experimente incluir a cidade.</div>';return}
-  for(const x of data){const b=document.createElement('button');b.className='result';b.setAttribute('role','option');const a=document.createElement('strong'),d=document.createElement('small');a.textContent=x.name||x.display_name.split(',')[0];d.textContent=x.display_name;b.append(a,d);b.onclick=()=>setDestination({lat:+x.lat,lon:+x.lon,name:a.textContent,address:x.display_name});box.append(b)}
- }catch(e){if(e.name!=='AbortError')box.innerHTML='<div class="resultsHint">Busca indispon\u00edvel. Verifique sua conex\u00e3o.</div>'}
+  const r=await fetch('https://photon.komoot.io/api/?'+params.toString(),{signal});
+  if(!r.ok)throw Error('photon');
+  const data=await r.json();
+  const places=(data.features||[]).map(photonPlace).filter(Boolean);
+  if(places.length){showResults(places);return}
+ }catch(e){if(e.name==='AbortError')return}
+ try{
+  const url='https://nominatim.openstreetmap.org/search?'+new URLSearchParams({format:'json',limit:'12',addressdetails:'1',q}).toString();
+  const r=await fetch(url,{signal,headers:{'Accept-Language':'pt-BR,pt'}});
+  if(!r.ok)throw Error('nominatim');
+  const data=await r.json();
+  showResults(data.map(x=>({lat:+x.lat,lon:+x.lon,name:x.name||x.display_name.split(',')[0],address:x.display_name})));
+ }catch(e){if(e.name!=='AbortError')box.innerHTML='<div class="resultsHint">ServiÃ§os de busca indisponÃ­veis. Verifique a internet e tente novamente.</div>'}
 }
 function setDestination(d){stop();S.destination=d;S.routes=[];S.selected=0;S.request++;S.lastVoice=-1;el('results').style.display='none';el('search').value=d.name;el('destinationTitle').textContent=d.name;el('destinationAddress').textContent=d.address||'Destino no mapa';el('eyebrow').textContent='DESTINO SELECIONADO';el('eta').textContent='\u2014';el('distance').textContent='\u2014';el('arrival').textContent='\u2014';el('routeList').replaceChildren();renderSteps();if(destMarker)map.removeLayer(destMarker);destMarker=L.marker([d.lat,d.lon],{icon:L.divIcon({className:'',html:'<div class="pin">\ud83d\udccd</div>',iconSize:[36,43],iconAnchor:[18,39]})}).addTo(map);routeLines.forEach(x=>map.removeLayer(x));routeLines=[];updateFavoriteIcon();if(S.position)routeTo();else{map.setView([d.lat,d.lon],14);toast('Toque em \u25ce para ativar o GPS e calcular a rota.')}}
 async function routeTo(){
@@ -140,14 +203,14 @@ el('searchButton').onclick=lookup;el('search').addEventListener('keydown',e=>{if
 el('quickGPS').onclick=gps;el('locate').onclick=()=>{gps();S.following=true;if(S.position)map.setView([S.position.lat,S.position.lon],S.running?17:16)};
 el('quickHome').onclick=()=>openShortcut('home');el('quickWork').onclick=()=>openShortcut('work');el('quickFavorite').onclick=openSaved;
 el('zoomIn').onclick=()=>map.zoomIn();el('zoomOut').onclick=()=>map.zoomOut();el('viewRoute').onclick=viewFullRoute;
-el('layer').onclick=()=>{S.style=(S.style+1)%layers.length;map.removeLayer(tiles);tiles=L.tileLayer(layers[S.style].url,{attribution:layers[S.style].credit,maxZoom:19}).addTo(map);toast(['Mapa OpenStreetMap','Mapa humanitario','Mapa padrao'][S.style])};
+el('layer').onclick=()=>{mountTiles((S.style+1)%layers.length);toast('Mapa '+layers[S.style].name+' ativado');};
 el('start').onclick=()=>S.running?stop():start();el('clear').onclick=clearRoute;el('save').onclick=toggleFavorite;el('share').onclick=share;
 el('voice').onclick=()=>{S.voice=!S.voice;el('voice').textContent=S.voice?'\ud83d\udd0a Voz':'\ud83d\udd07 Mudo';if(!S.voice&&'speechSynthesis' in window)speechSynthesis.cancel()};el('grip').onclick=toggleSheet;el('expand').onclick=toggleSheet;
 function setTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.id===id))}
 el('tabNavigate').onclick=()=>{setTab('tabNavigate');el('sheet').classList.remove('collapsed')};
 el('tabRoutes').onclick=()=>{setTab('tabRoutes');if(!S.routes.length)toast('Pesquise um destino para visualizar rotas.');else{el('sheet').classList.remove('collapsed');el('routeList').scrollIntoView({behavior:'smooth',block:'nearest'})}};
 el('tabSaved').onclick=()=>{setTab('tabSaved');openSaved()};el('tabMap').onclick=()=>{setTab('tabMap');el('sheet').classList.add('collapsed');viewFullRoute()};
-el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.1: mapa OpenStreetMap, busca Nominatim e rotas OSRM. Sem transito ao vivo e offline.')};
+el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.2: mapas OpenStreetMap/HOT, busca Photon/Nominatim, rotas OSRM. Sem trÃ¢nsito ao vivo/offline.')};
 map.on('dragstart',()=>{S.following=false});
 window.addEventListener('pagehide',()=>{if(S.watch!==null){navigator.geolocation.clearWatch(S.watch);S.watch=null}});
 // Pede a localizacao ao abrir; se bloqueada, toque em Meu GPS.
