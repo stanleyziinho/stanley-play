@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#050c19"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>STANLEY GPS ULTRA | V3.6</title>
+<title>STANLEY GPS ULTRA | V3.7</title>
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22STANLEY%20GPS%20ULTRA%22%2C%22short_name%22%3A%22STANLEY%20GPS%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%2F%22%2C%22background_color%22%3A%22%23050c19%22%2C%22theme_color%22%3A%22%23050c19%22%7D">
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoWBrh0Dk7BUdo=" crossorigin="">
 <style>
@@ -84,6 +84,22 @@
 .mapWarning{top:auto!important;bottom:calc(50dvh + 10px)!important;z-index:1100!important}
 @media(max-height:760px){.sheet{max-height:52dvh!important}.sheet.collapsed{max-height:220px!important}}
 
+
+/* V3.7: HUD de direÃ§Ã£o e painel mais legÃ­vel em telas pequenas */
+.speed{width:105px!important;min-height:126px;padding:14px 8px!important;border:1px solid #45bfff70!important;background:linear-gradient(140deg,#0c3150f5,#07172af5)!important;box-shadow:0 10px 28px #001325aa!important}
+.speedCaption{font-size:9px;letter-spacing:.13em;color:#a7ddff;font-weight:800;margin-bottom:7px}
+.speed b{font-size:40px!important;color:#fff;line-height:1.05}
+.speed .unit{font-size:12px!important;color:#58d9ff!important;margin-top:2px}
+.speed small{font-size:9px!important;margin-top:7px;color:#a8d1e9!important}
+.stats .stat{background:linear-gradient(145deg,#143556de,#0e213bdf)!important;border:1px solid #67b7ef33!important;border-radius:18px!important}
+.stats .stat strong{font-size:20px!important;color:#fff}.stats .stat:first-child strong{font-size:24px!important;color:#59f1ae}
+.stats .stat label{font-size:9px!important;color:#b5d5f0!important;letter-spacing:.03em!important}
+.roadEvents{position:absolute;z-index:1010;left:12px;bottom:calc(env(safe-area-inset-bottom) + min(58dvh,540px) + 22px);max-width:230px;padding:9px 12px;border-radius:15px;display:flex;flex-direction:column;gap:4px;pointer-events:none;font-size:11px;line-height:1.25}
+.roadEvents b{color:#dff5ff;font-size:11px}.roadEvents span{color:#a7c8df}
+.driving .roadEvents{bottom:calc(env(safe-area-inset-bottom) + min(45dvh,390px) + 20px)}
+.carMarker{width:40px;height:40px;display:grid;place-items:center;font-size:26px;filter:drop-shadow(0 4px 8px #000a);transition:transform .25s;line-height:1}
+.poiMarker{font-size:22px;filter:drop-shadow(0 2px 5px #000a);text-shadow:0 0 6px #000}
+@media(max-height:740px){.roadEvents{display:none}.speed{width:88px!important;min-height:100px}.speed b{font-size:31px!important}}
 </style>
 </head>
 <body>
@@ -92,20 +108,21 @@
 <div id="tileDiagnostic" aria-live="polite" style="position:fixed;z-index:970;left:12px;top:calc(env(safe-area-inset-top) + 300px);background:#092035eb;border:1px solid #81cfff66;border-radius:10px;padding:6px 9px;font:10px system-ui;color:#daf3ff;pointer-events:none">Mapa: iniciando...</div>
 <div class="app" id="app">
  <header class="top">
-  <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.6</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
+  <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.7</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
   <div class="search glass"><span class="glassIcon">&#8981;</span><input id="search" placeholder="Para onde vamos hoje?" aria-label="Buscar endere&#231;o"><button class="roundSearch" id="searchButton" aria-label="Pesquisar">&#10140;</button></div>
   <div class="results glass" id="results" role="listbox"></div>
   <nav class="quick"><button id="quickHome">&#8962; &nbsp;Casa</button><button id="quickWork">&#9635; &nbsp;Trabalho</button><button id="quickFavorite">&#9733; &nbsp;Favoritos</button><button id="quickGPS">&#9678; &nbsp;Meu GPS</button></nav>
  </header>
- <div class="hud"><div class="speed glass"><b id="speed">&#8212;</b><div class="unit">KM/H</div><small>Velocidade GPS</small></div><div class="bearing glass">RUMO &nbsp;<span id="heading">&#8212;</span></div></div>
+ <div class="hud"><div class="speed glass"><div class="speedCaption">VELOCIDADE</div><b id="speed">&#8212;</b><div class="unit">km/h</div><small id="speedQuality">Sem leitura</small></div><div class="bearing glass">RUMO &nbsp;<span id="heading">&#8212;</span></div></div>
  <div class="side"><button class="round glass" id="locate" title="Minha posi&#231;&#227;o">&#8982;</button><button class="round glass" id="layer" title="Trocar mapa">&#9672;</button><button class="round glass" id="zoomIn" title="Ampliar">+</button><button class="round glass" id="zoomOut" title="Reduzir">&#8722;</button><button class="round glass" id="viewRoute" title="Ver rota inteira">&#9671;</button></div>
  <div class="statusToast glass" id="toast" role="status"></div>
+ <div class="roadEvents glass" id="roadEvents" aria-live="polite"><b>ð¦ Sinais e radares</b><span id="roadEventsText">Selecione uma rota para consultar</span></div>
  <section class="sheet glass" id="sheet">
   <div class="grip" id="grip"></div>
   <div class="sheetContent" id="sheetContent">
    <div class="sheetTop"><div style="flex:1;min-width:0"><div class="overline" id="eyebrow">SEU PR&#211;XIMO DESTINO</div><div class="dest" id="destinationTitle">Explore sem limites.</div><div class="destAddress" id="destinationAddress">Mapa real, rotas inteligentes e estilo exclusivo.</div></div><div class="sheetTools"><button id="save" title="Salvar favorito">&#9734;</button><button id="expand" title="Recolher painel">&#8964;</button><button id="clear" title="Limpar">&#215;</button></div></div>
    <div class="maneuver" id="maneuver"><div class="turnSymbol" id="turnSymbol">&#8593;</div><div><div class="maneuverTitle" id="turnTitle">Siga em frente</div><div class="maneuverSub" id="turnSub">Aguardando posi&#231;&#227;o</div></div></div>
-   <div class="stats"><div class="stat"><label>Tempo estimado</label><strong id="eta">&#8212;</strong><small id="etaLabel">Selecione um destino</small></div><div class="stat"><label>Dist&#226;ncia</label><strong id="distance">&#8212;</strong><small>do percurso</small></div><div class="stat"><label>Chegada</label><strong id="arrival">&#8212;</strong><small>previs&#227;o</small></div></div>
+   <div class="stats"><div class="stat"><label>â± Tempo estimado</label><strong id="eta">&#8212;</strong><small id="etaLabel">Selecione um destino</small></div><div class="stat"><label>ð£ Dist&#226;ncia</label><strong id="distance">&#8212;</strong><small>do percurso</small></div><div class="stat"><label>ð Chegada</label><strong id="arrival">&#8212;</strong><small>previs&#227;o</small></div></div>
    <div class="actions"><button class="primary" id="start">&#9654; &nbsp;Iniciar navega&#231;&#227;o</button><button class="secondary" id="voice">&#128266; Voz</button><button class="secondary" id="share">&#8599;</button></div>
    <div class="routeList" id="routeList"></div>
    <div class="stepsBlock" id="stepsBlock"><div class="sectionTitle">PR&#211;XIMAS MANOBRAS <small id="stepCount">0 etapas</small></div><div class="steps" id="steps"><div class="step"><b>&#129517;</b><div><strong>Pronto para come&#231;ar</strong><small>Pesquise um destino para calcular sua rota.</small></div></div></div></div>
@@ -165,6 +182,70 @@ window.addEventListener('orientationchange',()=>setTimeout(repairMap,350));
 window.addEventListener('pageshow',repairMap);
 window.visualViewport?.addEventListener('resize',repairMap);
 let userMarker=null,accuracyCircle=null,destMarker=null,routeLines=[];
+let lastGoodPoint=null, lastGoodTimestamp=0, lastGoodHeading=null;
+let eventMarkers=L.layerGroup().addTo(map), latestEventQuery=0, roadEventList=[];
+const routePoints=()=>S.routes[S.selected]?.geometry?.coordinates||[];
+function setSpeedUI(c,ts){
+ const raw=c.speed;
+ let speed=null, quality='Sem leitura';
+ if(Number.isFinite(raw)&&raw>=0){speed=raw*3.6;quality=c.accuracy<=20?'Leitura GPS':'Sinal moderado'}
+ // Estimativa indireta sÃ³ em deslocamento contÃ­nuo, sem saltos grandes de posiÃ§Ã£o.
+ else if(lastGoodPoint && c.accuracy<=20 && lastGoodPoint.accuracy<=20){
+   const dt=(ts-lastGoodTimestamp)/1000,meters=haversine(lastGoodPoint,{lat:c.latitude,lon:c.longitude});
+   if(dt>=2 && dt<=12 && meters>12 && meters/dt<45){speed=meters/dt*3.6;quality='Estimativa por posiÃ§Ã£o'}
+ }
+ if(c.accuracy>45){speed=null;quality='PrecisÃ£o baixa'}
+ el('speed').textContent=speed===null?'â':String(Math.round(speed));
+ el('speedQuality').textContent=quality;
+ if(c.accuracy<=30){lastGoodPoint={lat:c.latitude,lon:c.longitude,accuracy:c.accuracy};lastGoodTimestamp=ts}
+ return speed;
+}
+function carIcon(deg){
+ const rotate=Number.isFinite(deg)?deg:0;
+ return L.divIcon({className:'',html:'<div class="carMarker" style="transform:rotate('+rotate+'deg)">ð</div>',iconSize:[40,40],iconAnchor:[20,20]});
+}
+function projectNearRoute(lat,lon){
+ const pts=routePoints();if(pts.length<2)return {distance:Infinity,ahead:Infinity};
+ const pos={lat,lon};let nearest=Infinity,at=0,passed=0;
+ for(let i=0;i<pts.length-1;i++){
+   const a={lat:pts[i][1],lon:pts[i][0]},b={lat:pts[i+1][1],lon:pts[i+1][0]};
+   const d=nearestOnSegment(pos,a,b);
+   if(d<nearest){nearest=d;at=passed+haversine(a,pos)}
+   passed+=haversine(a,b);
+ }
+ return {distance:nearest,ahead:at};
+}
+async function loadRoadEvents(){
+ const token=++latestEventQuery;eventMarkers.clearLayers();roadEventList=[];
+ const pts=routePoints();if(pts.length<2){el('roadEventsText').textContent='Selecione uma rota para consultar';return}
+ el('roadEventsText').textContent='Consultando dados abertos...';
+ const lats=pts.map(p=>p[1]),lons=pts.map(p=>p[0]);
+ let minLat=Math.min(...lats),maxLat=Math.max(...lats),minLon=Math.min(...lons),maxLon=Math.max(...lons);
+ const delta=.007;minLat-=delta;maxLat+=delta;minLon-=delta;maxLon+=delta;
+ // Evita consultas enormes em trajetos longos.
+ if((maxLat-minLat)*(maxLon-minLon)>.09){el('roadEventsText').textContent='Consulta indisponÃ­vel para rota extensa';return}
+ const bbox=[minLat,minLon,maxLat,maxLon].map(n=>n.toFixed(5)).join(',');
+ const query=`[out:json][timeout:12];(node["highway"="traffic_signals"](${bbox});node["highway"="speed_camera"](${bbox});node["enforcement"="maxspeed"](${bbox}););out body;`;
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),16000);
+ try{
+   const resp=await fetch('https://overpass.private.coffee/api/interpreter',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:controller.signal});
+   if(!resp.ok)throw Error('Consulta indisponÃ­vel');const json=await resp.json();if(token!==latestEventQuery)return;
+   const unique=new Set();
+   for(const item of json.elements||[]){
+     if(!Number.isFinite(item.lat)||!Number.isFinite(item.lon))continue;
+     const kind=item.tags?.highway==='traffic_signals'?'signal':'radar',key=kind+':'+item.id;
+     if(unique.has(key))continue;unique.add(key);
+     const near=projectNearRoute(item.lat,item.lon);if(near.distance>65)continue;
+     const marker=L.marker([item.lat,item.lon],{icon:L.divIcon({className:'',html:'<div class="poiMarker">'+(kind==='signal'?'ð¦':'ð·')+'</div>',iconSize:[30,30],iconAnchor:[15,15]})});
+     marker.bindPopup(kind==='signal'?'SemÃ¡foro cadastrado no OpenStreetMap':'Ponto de fiscalizaÃ§Ã£o cadastrado no OpenStreetMap â nÃ£o verificado');marker.addTo(eventMarkers);
+     roadEventList.push({lat:item.lat,lon:item.lon,kind,routeProgress:near.ahead});
+   }
+   const signals=roadEventList.filter(x=>x.kind==='signal').length,radars=roadEventList.length-signals;
+   el('roadEventsText').textContent=signals+' semÃ¡foros Â· '+radars+' pontos de fiscalizaÃ§Ã£o (nÃ£o verificados)';
+ }catch(e){if(token===latestEventQuery)el('roadEventsText').textContent='Sem dados de semÃ¡foros/radares nesta consulta';}
+ finally{clearTimeout(timer)}
+}
+
 const coord=([lon,lat])=>[lat,lon];
 const formatDistance=n=>!Number.isFinite(n)?'\u2014':n<1000?Math.round(n)+' m':(n/1000).toFixed(1).replace('.',',')+' km';
 const formatDuration=n=>!Number.isFinite(n)?'\u2014':n<3600?Math.max(1,Math.round(n/60))+' min':Math.floor(n/3600)+'h '+Math.round(n%3600/60)+'m';
@@ -186,13 +267,13 @@ function gps(){
  gpsUI(false,'CONECTANDO...');
  S.watch=navigator.geolocation.watchPosition(p=>{
    const c=p.coords;S.position={lat:c.latitude,lon:c.longitude};
-   el('speed').textContent=kmh(c.speed);
+   const estimatedSpeed=setSpeedUI(c,p.timestamp||Date.now());
    el('accuracy').textContent=formatDistance(c.accuracy);
    const head=headingLabel(c.heading);el('heading').textContent=head;el('direction').textContent=head;
    gpsUI(true,'GPS CONECTADO');
    const ll=[c.latitude,c.longitude];
-   if(!userMarker){userMarker=L.marker(ll,{zIndexOffset:1500,icon:L.divIcon({className:'',html:'<div class="myDot"></div>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map);accuracyCircle=L.circle(ll,{radius:c.accuracy,color:'#32d8ff',fillColor:'#32d8ff',fillOpacity:.07,weight:1}).addTo(map);if(!S.destination)map.setView(ll,16)}
-   else{userMarker.setLatLng(ll);accuracyCircle.setLatLng(ll).setRadius(c.accuracy)}
+   if(!userMarker){userMarker=L.marker(ll,{zIndexOffset:1500,icon:carIcon(c.heading)}).addTo(map);accuracyCircle=L.circle(ll,{radius:c.accuracy,color:'#32d8ff',fillColor:'#32d8ff',fillOpacity:.07,weight:1}).addTo(map);if(!S.destination)map.setView(ll,16)}
+   else{userMarker.setLatLng(ll);userMarker.setIcon(carIcon(c.heading));accuracyCircle.setLatLng(ll).setRadius(c.accuracy)}
    if(S.following){if(S.running)map.panTo(ll,{animate:false});else if(!S.destination)map.panTo(ll,{animate:false})}
    if(S.destination&&!S.routes.length)routeTo();
    if(S.running&&S.routes.length)updateGuidance();
@@ -242,22 +323,33 @@ async function lookup(){
  if(S.searchRequest)S.searchRequest.abort();
  S.searchRequest=new AbortController();const signal=S.searchRequest.signal;
  const box=el('results');box.style.display='block';box.innerHTML='<div class="resultsHint">Conferindo ruas, nÃºmeros e estabelecimentos...</div>';
- let all=[];
+ let all=[];let qLookup=q;
+ // CEP brasileiro: ViaCEP nÃ£o exige API key. Seu resultado identifica a rua, nÃ£o necessariamente o imÃ³vel.
+ const cep=q.replace(/\D/g,'');
+ if(/^\d{8}$/.test(cep)){
+   try{
+     const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/',{signal});
+     if(r.ok){const data=await r.json();if(!data.erro){
+       const address=[data.logradouro,data.bairro,data.localidade,data.uf].filter(Boolean).join(', ');
+       qLookup=address;
+     }}
+   }catch(e){if(e.name==='AbortError')return}
+ }
  // Nominatim prioriza endereÃ§o completo, com cidade, nÃºmero e CEP quando existentes.
  try{
-   const params=new URLSearchParams({format:'jsonv2',limit:'10',addressdetails:'1',q});
+   const params=new URLSearchParams({format:'jsonv2',limit:'10',addressdetails:'1',q:qLookup});
    const r=await fetch('https://nominatim.openstreetmap.org/search?'+params,{signal,headers:{'Accept-Language':'pt-BR,pt'}});
    if(r.ok){const data=await r.json();all.push(...data.map(x=>({lat:+x.lat,lon:+x.lon,name:x.name||x.display_name.split(',')[0],address:x.display_name,source:'EndereÃ§o detalhado'})))}
  }catch(e){if(e.name==='AbortError')return}
  try{
-   const params=new URLSearchParams({q,limit:'15',lang:'pt'});
+   const params=new URLSearchParams({q:qLookup,limit:'15',lang:'pt'});
    if(S.position){params.set('lat',String(S.position.lat));params.set('lon',String(S.position.lon))}
    const r=await fetch('https://photon.komoot.io/api/?'+params,{signal});
    if(r.ok){const data=await r.json();all.push(...(data.features||[]).map(photonPlace).filter(Boolean).map(x=>({...x,source:'Lugares e ruas'})))}
  }catch(e){if(e.name==='AbortError')return}
- showResults(all,q);
+ showResults(all,qLookup);
 }
-function setDestination(d){stop();S.destination=d;S.routes=[];S.selected=0;S.request++;S.lastVoice=-1;el('results').style.display='none';el('search').value=d.name;el('destinationTitle').textContent=d.name;el('destinationAddress').textContent=d.address||'Destino no mapa';el('eyebrow').textContent='DESTINO SELECIONADO';el('eta').textContent='\u2014';el('distance').textContent='\u2014';el('arrival').textContent='\u2014';el('routeList').replaceChildren();renderSteps();if(destMarker)map.removeLayer(destMarker);destMarker=L.marker([d.lat,d.lon],{icon:L.divIcon({className:'',html:'<div class="pin">\ud83d\udccd</div>',iconSize:[36,43],iconAnchor:[18,39]})}).addTo(map);routeLines.forEach(x=>map.removeLayer(x));routeLines=[];updateFavoriteIcon();if(S.position)routeTo();else{map.setView([d.lat,d.lon],14);toast('Toque em \u25ce para ativar o GPS e calcular a rota.')}}
+function setDestination(d){latestEventQuery++;eventMarkers.clearLayers();roadEventList=[];el('roadEventsText').textContent='Aguardando cÃ¡lculo da rota';stop();S.destination=d;S.routes=[];S.selected=0;S.request++;S.lastVoice=-1;el('results').style.display='none';el('search').value=d.address||d.name;el('destinationTitle').textContent=d.name;el('destinationAddress').textContent=d.address||'Destino no mapa';el('eyebrow').textContent='DESTINO SELECIONADO';el('eta').textContent='\u2014';el('distance').textContent='\u2014';el('arrival').textContent='\u2014';el('routeList').replaceChildren();renderSteps();if(destMarker)map.removeLayer(destMarker);destMarker=L.marker([d.lat,d.lon],{icon:L.divIcon({className:'',html:'<div class="pin">\ud83d\udccd</div>',iconSize:[36,43],iconAnchor:[18,39]})}).addTo(map);routeLines.forEach(x=>map.removeLayer(x));routeLines=[];updateFavoriteIcon();if(S.position)routeTo();else{map.setView([d.lat,d.lon],14);toast('Toque em \u25ce para ativar o GPS e calcular a rota.')}}
 async function routeTo(){
  if(!S.destination||!S.position)return;
  const request=++S.request,p=S.position,d=S.destination;
@@ -265,14 +357,14 @@ async function routeTo(){
  try{
   const url=`https://router.project-osrm.org/route/v1/driving/${p.lon},${p.lat};${d.lon},${d.lat}?overview=full&geometries=geojson&steps=true&alternatives=true`;
   const response=await fetch(url);if(!response.ok)throw Error('route');const j=await response.json();if(request!==S.request)return;if(j.code!=='Ok'||!j.routes?.length)throw Error('empty');
-  S.routes=j.routes;S.selected=0;S.lastVoice=-1;drawRoute();renderSummary();renderRouteChoices();renderSteps();el('eyebrow').textContent=S.running?'NAVEGA\u00c7\u00c3O ATIVA':'ROTAS ENCONTRADAS';if(S.running)updateGuidance();
+  S.routes=j.routes;S.selected=0;S.lastVoice=-1;drawRoute();loadRoadEvents();renderSummary();renderRouteChoices();renderSteps();el('eyebrow').textContent=S.running?'NAVEGA\u00c7\u00c3O ATIVA':'ROTAS ENCONTRADAS';if(S.running)updateGuidance();
  }catch(e){if(request!==S.request)return;el('eyebrow').textContent='ROTA INDISPON\u00cdVEL';el('etaLabel').textContent='Falha no servi\u00e7o de rotas';toast('Servidor de rotas indispon\u00edvel. Toque em Iniciar para tentar novamente.');el('routeList').replaceChildren();const b=document.createElement('button');b.className='route';b.style.minWidth='100%';b.textContent='Abrir dire\u00e7\u00f5es no Google Maps';b.onclick=()=>{const d=S.destination,p=S.position;if(!d)return;const link='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(d.lat+','+d.lon)+'&travelmode=driving'+(p?'&origin='+encodeURIComponent(p.lat+','+p.lon):'');window.open(link,'_blank','noopener')};el('routeList').appendChild(b);console.warn('Falha roteamento',e);}
 }
 function drawRoute(){routeLines.forEach(x=>map.removeLayer(x));routeLines=[];S.routes.forEach((r,i)=>{const active=i===S.selected;const l=L.polyline(r.geometry.coordinates.map(coord),{color:active?'#26cfff':'#8199b6',weight:active?8:5,opacity:active?1:.45,lineCap:'round',lineJoin:'round'}).addTo(map);l.on('click',()=>selectRoute(i));routeLines.push(l)});routeLines[S.selected]?.bringToFront();if(!S.running)viewFullRoute()}
 function viewFullRoute(){const l=routeLines[S.selected];if(l){map.fitBounds(l.getBounds(),{paddingTopLeft:[30,175],paddingBottomRight:[30,270],maxZoom:15,animate:true})}else if(S.position)map.setView([S.position.lat,S.position.lon],16)}
 function renderSummary(){const r=S.routes[S.selected];if(!r)return;el('eta').textContent=formatDuration(r.duration);el('etaLabel').textContent=S.running?'Navegando':'Rota calculada';el('distance').textContent=formatDistance(r.distance);el('arrival').textContent=getEta(r.duration)}
 function renderRouteChoices(){const box=el('routeList');box.replaceChildren();S.routes.forEach((r,i)=>{const b=document.createElement('button');b.className='route'+(i===S.selected?' selected':'');const name=document.createElement('strong'),time=document.createElement('span'),dist=document.createElement('small');name.textContent='OP\u00c7\u00c3O '+(i+1);time.textContent=formatDuration(r.duration);dist.textContent=formatDistance(r.distance);b.append(name,time,dist);b.onclick=()=>selectRoute(i);box.append(b)})}
-function selectRoute(i){if(S.running){toast('Encerre a navega\u00e7\u00e3o para trocar de rota.');return}S.selected=i;S.lastVoice=-1;drawRoute();renderSummary();renderRouteChoices();renderSteps()}
+function selectRoute(i){if(S.running){toast('Encerre a navega\u00e7\u00e3o para trocar de rota.');return}S.selected=i;S.lastVoice=-1;drawRoute();loadRoadEvents();renderSummary();renderRouteChoices();renderSteps()}
 function wording(step){const m=step.maneuver||{},type=m.type||'',modifier=m.modifier||'';if(type==='arrive')return ['\u2691','Voc\u00ea chegou ao destino'];if(type==='depart')return ['\u2191','Siga em frente'];if(['roundabout','rotary'].includes(type))return ['\u21bb','Entre na rotat\u00f3ria'];if(modifier==='uturn')return ['\u21b6','Fa\u00e7a o retorno'];if(modifier.includes('right'))return ['\u21b1',modifier.includes('slight')?'Mantenha-se \u00e0 direita':'Vire \u00e0 direita'];if(modifier.includes('left'))return ['\u21b0',modifier.includes('slight')?'Mantenha-se \u00e0 esquerda':'Vire \u00e0 esquerda'];if(type==='merge')return ['\u2197','Entre na via indicada'];return ['\u2191','Continue em frente']}
 function stepsForRoute(){return S.routes[S.selected]?.legs?.flatMap(x=>x.steps)||[]}
 function renderSteps(){const box=el('steps');box.replaceChildren();const steps=stepsForRoute();el('stepCount').textContent=steps.length+' etapas';if(!steps.length){const r=document.createElement('div');r.className='step';r.textContent='As pr\u00f3ximas manobras aparecer\u00e3o quando a rota for calculada.';box.append(r);return}steps.slice(0,12).forEach(s=>{const [symbol,t]=wording(s),row=document.createElement('div'),icon=document.createElement('b'),wrap=document.createElement('div'),title=document.createElement('strong'),sub=document.createElement('small');row.className='step';icon.textContent=symbol;title.textContent=t+(s.name?' \u2022 '+s.name:'');sub.textContent=formatDistance(s.distance);wrap.append(title,sub);row.append(icon,wrap);box.append(row)})}
@@ -280,7 +372,7 @@ function nextManeuver(){const steps=stepsForRoute();if(!steps.length||!S.positio
 function updateGuidance(){if(!S.position||!S.destination)return;if(haversine(S.position,S.destination)<30){el('turnTitle').textContent='Destino alcan\u00e7ado';el('turnSub').textContent='Voc\u00ea chegou ao local';speak('Voc\u00ea chegou ao seu destino');stop();return}const info=nextManeuver();if(!info)return;const [symbol,msg]=wording(info.step);el('maneuver').style.display='flex';el('turnSymbol').textContent=symbol;el('turnTitle').textContent=msg;el('turnSub').textContent=(info.dist<25?'Agora':'Em '+formatDistance(info.dist))+(info.step.name?' \u00b7 '+info.step.name:'');if(info.dist<180&&S.lastVoice!==info.index){S.lastVoice=info.index;speak(msg+' em '+Math.max(10,Math.round(info.dist/10)*10)+' metros')}if(Date.now()-S.lastReroute>25000&&offRouteDistance()>110){S.lastReroute=Date.now();toast('Fora da rota. Recalculando...');routeTo()}}
 function start(){if(!S.destination){toast('Escolha um destino antes de iniciar.');el('search').focus();return}if(!S.position){gps();toast('Ative sua localiza\u00e7\u00e3o para navegar.');return}if(!S.routes.length){routeTo();return}S.running=true;S.following=true;el('app').classList.add('driving');el('start').textContent='\u25a0 Encerrar navega\u00e7\u00e3o';el('eyebrow').textContent='NAVEGA\u00c7\u00c3O EM ANDAMENTO';map.setView([S.position.lat,S.position.lon],17);updateGuidance();speak('Navega\u00e7\u00e3o iniciada. Siga as instru\u00e7\u00f5es na tela.')}
 function stop(){S.running=false;el('app').classList.remove('driving');el('maneuver').style.display='none';el('start').textContent='\u25b6  Iniciar navega\u00e7\u00e3o';if(S.destination)el('eyebrow').textContent='ROTA DISPON\u00cdVEL';if('speechSynthesis' in window)speechSynthesis.cancel()}
-function clearRoute(){stop();S.request++;S.destination=null;S.routes=[];el('search').value='';el('destinationTitle').textContent='Explore sem limites.';el('destinationAddress').textContent='Mapa real, rotas inteligentes e estilo exclusivo.';el('eyebrow').textContent='SEU PR\u00d3XIMO DESTINO';['eta','distance','arrival'].forEach(id=>el(id).textContent='\u2014');el('etaLabel').textContent='Selecione um destino';el('routeList').replaceChildren();renderSteps();el('results').style.display='none';routeLines.forEach(l=>map.removeLayer(l));routeLines=[];if(destMarker){map.removeLayer(destMarker);destMarker=null}updateFavoriteIcon()}
+function clearRoute(){latestEventQuery++;eventMarkers.clearLayers();roadEventList=[];el('roadEventsText').textContent='Selecione uma rota para consultar';stop();S.request++;S.destination=null;S.routes=[];el('search').value='';el('destinationTitle').textContent='Explore sem limites.';el('destinationAddress').textContent='Mapa real, rotas inteligentes e estilo exclusivo.';el('eyebrow').textContent='SEU PR\u00d3XIMO DESTINO';['eta','distance','arrival'].forEach(id=>el(id).textContent='\u2014');el('etaLabel').textContent='Selecione um destino';el('routeList').replaceChildren();renderSteps();el('results').style.display='none';routeLines.forEach(l=>map.removeLayer(l));routeLines=[];if(destMarker){map.removeLayer(destMarker);destMarker=null}updateFavoriteIcon()}
 function updateFavoriteIcon(){el('save').textContent=S.destination&&saved.favorites.some(x=>x.lat===S.destination.lat&&x.lon===S.destination.lon)?'\u2605':'\u2606'}
 function toggleFavorite(){if(!S.destination){toast('Selecione um destino para salvar.');return}const d=S.destination,index=saved.favorites.findIndex(x=>x.lat===d.lat&&x.lon===d.lon);if(index>=0){saved.favorites.splice(index,1);toast('Removido dos favoritos.')}else{saved.favorites.push({...d});toast('Destino salvo nos favoritos.')}saveData();updateFavoriteIcon()}
 function openSaved(){const list=[...(saved.home?[{...saved.home,name:'\u2302 Casa \u00b7 '+saved.home.name}]:[]),...(saved.work?[{...saved.work,name:'\u25a3 Trabalho \u00b7 '+saved.work.name}]:[]),...saved.favorites];const box=el('results');box.replaceChildren();box.style.display='block';if(!list.length){box.innerHTML='<div class="resultsHint">Nenhum destino salvo. Escolha um destino e toque em \u2606.</div>';return}list.forEach(d=>{const b=document.createElement('button');b.className='result';const a=document.createElement('strong'),s=document.createElement('small');a.textContent=d.name;s.textContent=d.address||'Local salvo';b.append(a,s);b.onclick=()=>setDestination({...d});box.append(b)})}
@@ -298,7 +390,7 @@ function setTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.tog
 el('tabNavigate').onclick=()=>{setTab('tabNavigate');el('sheet').classList.remove('collapsed')};
 el('tabRoutes').onclick=()=>{setTab('tabRoutes');if(!S.routes.length)toast('Pesquise um destino para visualizar rotas.');else{el('sheet').classList.remove('collapsed');el('routeList').scrollIntoView({behavior:'smooth',block:'nearest'})}};
 el('tabSaved').onclick=()=>{setTab('tabSaved');openSaved()};el('tabMap').onclick=()=>{setTab('tabMap');el('sheet').classList.add('collapsed');viewFullRoute()};
-el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.6: mapas OpenStreetMap/HOT, busca Photon/Nominatim, rotas OSRM. Sem trÃ¢nsito ao vivo/offline.')};
+el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.7: velocidade estimada pelo GPS, radar e semÃ¡foro somente quando cadastrados no OpenStreetMap. Dados incompletos.')};
 map.on('dragstart',()=>{S.following=false});
 // Quando o nÃºmero nÃ£o existe no mapa, pressione por 1 segundo no ponto desejado.
 let pinPressTimer=null, pinPressStartedAt=0;
@@ -315,6 +407,7 @@ map.on('mousedown touchstart',e=>{
 map.on('mouseup touchend dragstart zoomstart',()=>clearTimeout(pinPressTimer));
 
 window.addEventListener('pagehide',()=>{if(S.watch!==null){navigator.geolocation.clearWatch(S.watch);S.watch=null}});
+// Os radares e semÃ¡foros sÃ£o informativos, nÃ£o substituem sinalizaÃ§Ã£o oficial.
 // Pede a localizacao ao abrir; se bloqueada, toque em Meu GPS.
 setTimeout(gps,800);
 </script>
