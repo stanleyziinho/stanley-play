@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#130922">
+<title>STANLEY PLAYER V4.1</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#080611;
+ color:white;
+ font-family:system-ui,-apple-system,Arial,sans-serif;
+ min-height:100vh
+}
+main{max-width:1000px;margin:auto;padding:14px}
+header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ margin-bottom:14px
+}
+h1{font-size:clamp(18px,5vw,26px);margin:0}
+h1 span{color:#bc8aff}
+.btn{
+ display:inline-block;
+ background:#7237ce;
+ border:1px solid #9867e7;
+ border-radius:12px;
+ padding:12px 15px;
+ color:white;
+ font-size:13px;
+ font-weight:700;
+ text-decoration:none;
+ cursor:pointer
+}
+.secondary{background:#30204b}
+#title{margin:10px 0;font-size:21px}
+#status{
+ background:#241537;
+ border:1px solid #53357f;
+ border-radius:13px;
+ padding:15px;
+ margin:12px 0;
+ color:#e3d0ff;
+ font-size:13px
+}
+#game{
+ width:100%;
+ height:min(72vh,580px);
+ min-height:340px;
+ background:#050309;
+ border:1px solid #5c3890;
+ border-radius:14px;
+ overflow:hidden
+}
+.hint{
+ font-size:12px;
+ color:#b9a5ce;
+ line-height:1.6;
+ margin-top:12px
+}
+#loading{
+ padding:20px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:12px
+}
+.spinner{
+ width:22px;
+ height:22px;
+ border:3px solid #5f388c;
+ border-top-color:#c8a2ff;
+ border-radius:50%;
+ animation:spin .8s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<main>
+<header>
+<h1>🎮 STANLEY <span>PLAYER</span></h1>
+<a class="btn secondary" href="./retro.html">← Biblioteca</a>
+</header>
+
+<h2 id="title">Preparando jogo...</h2>
+
+<div id="status" role="status">
+ <div id="loading">
+  <div class="spinner"></div>
+  <span id="message">Carregando arquivo...</span>
+ </div>
+ <div id="error" hidden></div>
+</div>
+
+<section id="game"></section>
+
+<div class="actions" style="margin-top:12px">
+<button id="retry" class="btn secondary">↻ Reiniciar player</button>
+<button id="fullscreen" class="btn secondary">⛶ Tela cheia</button>
+</div>
+
+<p class="hint">
+O emulador é executado em uma página separada da biblioteca.
+Ao retornar, esta sessão será encerrada.
+Para evitar cortes no áudio, mantenha o VSync desativado
+nas configurações do EmulatorJS, caso necessário.
+</p>
+
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+
+const params=new URLSearchParams(location.search);
+const id=Number(params.get("id"));
+
+let romURL=null;
+let biosURL=null;
+let started=false;
+
+function message(text){
+ $("message").textContent=text;
+}
+
+function error(text){
+ $("loading").hidden=true;
+ $("error").hidden=false;
+ $("error").textContent=text;
+}
+
+function release(){
+ if(romURL){
+  URL.revokeObjectURL(romURL);
+  romURL=null;
+ }
+
+ if(biosURL){
+  URL.revokeObjectURL(biosURL);
+  biosURL=null;
+ }
+}
+
+async function getSavedGame(gameId){
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open("stanley-retro-v3",1);
+
+  request.onerror=()=>{
+   reject(Error("Não foi possível abrir a biblioteca."));
+  };
+
+  request.onsuccess=()=>{
+   const db=request.result;
+
+   if(!db.objectStoreNames.contains("roms")){
+    db.close();
+    reject(Error("Biblioteca não encontrada neste dispositivo."));
+    return;
+   }
+
+   const tx=db.transaction("roms","readonly");
+   const result=tx.objectStore("roms").get(gameId);
+
+   result.onsuccess=()=>{
+    resolve(result.result);
+   };
+
+   result.onerror=()=>{
+    reject(result.error||Error("Falha na leitura do jogo."));
+   };
+
+   tx.oncomplete=()=>db.close();
+  };
+ });
+}
+
+async function start(){
+ if(started)return;
+ started=true;
+
+ if(!Number.isSafeInteger(id)||id<=0){
+  error("Jogo não identificado. Volte à biblioteca.");
+  return;
+ }
+
+ try{
+  message("Lendo jogo salvo...");
+
+  const game=await getSavedGame(id);
+
+  if(!game){
+   error("Jogo não encontrado. Volte à biblioteca.");
+   return;
+  }
+
+  if(!(game.rom instanceof Blob)){
+   error("Arquivo ROM inválido ou indisponível.");
+   return;
+  }
+
+  const allowed=[
+   "nes","snes","segaMD","gb","gbc",
+   "gba","psx","n64","psp"
+  ];
+
+  if(!allowed.includes(game.core)){
+   error("Console não reconhecido.");
+   return;
+  }
+
+  if(game.core==="psp"){
+   error(
+    "PSP ainda não está habilitado nesta hospedagem. " +
+    "Sua ROM continua salva na biblioteca."
+   );
+   return;
+  }
+
+  if(game.core==="n64"&&game.rom.size>50*1048576){
+   const proceed=confirm(
+    "Nintendo 64 pode exigir muita memória no iPhone. " +
+    "Deseja tentar iniciar?"
+   );
+   if(!proceed){
+    location.replace("./retro.html");
+    return;
+   }
+  }
+
+  if(game.core==="psx"&&!game.bios){
+   const proceed=confirm(
+    "Este jogo de PS1 pode precisar de uma BIOS " +
+    "compatível. Deseja tentar sem BIOS?"
+   );
+   if(!proceed){
+    location.replace("./retro.html");
+    return;
+   }
+  }
+
+  $("title").textContent=game.title||"Jogo retrô";
+  message("Preparando emulador...");
+
+  romURL=URL.createObjectURL(game.rom);
+
+  if(game.bios instanceof Blob){
+   biosURL=URL.createObjectURL(game.bios);
+  }
+
+  window.EJS_player="#game";
+  window.EJS_core=game.core;
+  window.EJS_gameUrl=romURL;
+  window.EJS_gameName=game.title||"STANLEY GAME";
+  window.EJS_biosUrl=biosURL||"";
+  window.EJS_pathtodata=
+   "https://cdn.emulatorjs.org/stable/data/";
+
+  window.EJS_color="#8b5cf6";
+  window.EJS_volume=0.65;
+  window.EJS_startOnLoaded=true;
+  window.EJS_threads=false;
+
+  message("Carregando núcleo do console...");
+
+  const loader=document.createElement("script");
+  loader.src=
+   "https://cdn.emulatorjs.org/stable/data/loader.js";
+
+  loader.onload=()=>{
+   $("loading").hidden=true;
+   $("status").insertAdjacentHTML(
+    "beforeend",
+    "<div>Emulador carregado. " +
+    "Aguarde o jogo iniciar. " +
+    "Se a tela continuar preta, a ROM " +
+    "pode ser incompatível.</div>"
+   );
+  };
+
+  loader.onerror=()=>{
+   error(
+    "Não foi possível carregar o EmulatorJS. " +
+    "Verifique a internet."
+   );
+  };
+
+  document.body.append(loader);
+
+ }catch(e){
+  error("Falha ao preparar jogo: "+e.message);
+ }
+}
+
+$("retry").onclick=()=>{
+ location.reload();
+};
+
+$("fullscreen").onclick=()=>{
+ const area=$("game");
+
+ if(area.requestFullscreen){
+  area.requestFullscreen().catch(()=>{
+   alert("Use o botão de tela cheia do emulador.");
+  });
+ }else{
+  alert("Use o controle de tela cheia do EmulatorJS.");
+ }
+};
+
+window.addEventListener("pagehide",release);
+
+start();
+</script>
+</body>
+</html>
