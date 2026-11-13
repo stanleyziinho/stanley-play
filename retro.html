@@ -1,94 +1,153 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#130922">
-<title>STANLEY RETRO V2.1</title>
+<title>STANLEY RETRO V3.0</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at top right,#371368,#0b0715 65%);color:white;font-family:Arial,sans-serif;min-height:100vh}
-main{max-width:1050px;margin:auto;padding:20px}
-a{color:#c7a3ff;text-decoration:none}
-h1{font-size:32px;margin:28px 0 8px}
-h1 span{color:#b17aff}
-p{color:#cdbce0;line-height:1.5}
-.panel{background:#1c112c;border:1px solid #563783;border-radius:18px;padding:20px;margin:20px 0}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{background:linear-gradient(140deg,#3a1d64,#21132f);border:1px solid #6a3e98;border-radius:15px;padding:18px;text-align:center}
-.icon{font-size:40px}
-.card h3{font-size:16px;margin:10px 0}
-.card p{font-size:12px;min-height:35px}
-.btn,button{display:inline-block;background:#813de5;color:white;border:0;border-radius:11px;padding:12px 15px;font-size:14px;font-weight:bold;cursor:pointer}
-.card .btn{width:100%;font-size:12px}
-label{display:block;margin:15px 0 8px;font-weight:bold}
-select,input{width:100%;background:#301b48;color:white;border:1px solid #7946aa;border-radius:12px;padding:14px;font-size:16px}
-#game{width:100%;height:500px;min-height:300px;background:#06030c;border-radius:12px}
+body{
+margin:0;
+background:radial-gradient(circle at 85% 0%,#391669,#090612 60%);
+color:white;
+font-family:system-ui,Arial,sans-serif;
+min-height:100vh
+}
+main{max-width:1100px;margin:auto;padding:18px 15px 60px}
+a{color:#c8aaff;text-decoration:none}
+h1{font-size:clamp(27px,6vw,43px);margin:23px 0 5px}
+h1 span{color:#b68aff}
+p{color:#cbbbdf;line-height:1.5}
+small{color:#ad9bbc}
+.panel{
+background:#1b112c;
+border:1px solid #573686;
+border-radius:19px;
+padding:18px;
+margin:18px 0
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:12px
+}
+.card{
+background:linear-gradient(140deg,#361a5e,#191127);
+border:1px solid #61408c;
+border-radius:15px;
+padding:14px;
+min-width:0
+}
+.art{
+font-size:44px;
+text-align:center;
+padding:13px;
+background:radial-gradient(circle,#6531a7,#251335);
+border-radius:12px
+}
+.card h3{
+font-size:15px;
+margin:12px 0 5px;
+overflow-wrap:anywhere
+}
+.card p{font-size:12px;margin:5px 0 12px}
+.btn,button{
+display:inline-block;
+background:#813de5;
+color:white;
+border:0;
+border-radius:11px;
+padding:12px 14px;
+font-size:14px;
+font-weight:700;
+cursor:pointer
+}
+button:disabled{opacity:.5}
+.card .btn{
+width:100%;
+text-align:center;
+margin:4px 0
+}
+.danger{background:#4a2945}
+.secondary{background:#392352}
+label{
+display:block;
+font-weight:700;
+margin:13px 0 7px
+}
+input,select{
+width:100%;
+padding:13px;
+background:#2b1b44;
+color:white;
+border:1px solid #8254ba;
+border-radius:11px;
+font-size:16px
+}
+input[type=file]{font-size:13px}
 #player{display:none}
-.note{font-size:12px;color:#baa9ce}
-@media(min-width:750px){.grid{grid-template-columns:repeat(3,1fr)}}
+#game{
+width:100%;
+height:min(72vh,560px);
+min-height:310px;
+background:#050309;
+border-radius:12px;
+overflow:hidden
+}
+#status{font-size:13px;min-height:20px}
+.notice{
+background:#281a3a;
+border-left:3px solid #a56bf8;
+border-radius:8px;
+padding:12px;
+font-size:12px
+}
+.row{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+align-items:center
+}
+.row button{flex:1}
+.tag{
+display:inline-block;
+background:#47226c;
+padding:5px 9px;
+border-radius:8px;
+font-size:11px
+}
+.hidden{display:none!important}
+@media(min-width:700px){
+.grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 </style>
 </head>
 <body>
 <main>
-<a href="./index.html">← Voltar ao STANLEY PLAY</a>
+
+<a href="./index.html">← STANLEY PLAY</a>
+
 <h1>🕹 STANLEY <span>RETRO</span></h1>
-<p>Explore jogos clássicos independentes e jogue diretamente no seu navegador.</p>
+<p>Seus consoles clássicos e jogos favoritos em um só lugar.</p>
 
-<section class="panel">
-<h2>🎮 Biblioteca por console</h2>
-<p>Encontre jogos homebrew nos catálogos dos criadores.</p>
-<div class="grid">
-
-<div class="card">
-<div class="icon">🎮</div>
-<h3>Nintendo NES</h3>
-<p>Jogos retrô de 8 bits</p>
-<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/free/tag-homebrew/tag-nes-rom">Encontrar jogos ↗</a>
+<section class="panel" id="collectionPanel">
+<div class="row" style="justify-content:space-between">
+<h2>🎮 Minha Biblioteca</h2>
+<span class="tag" id="count">0 jogos</span>
 </div>
-
-<div class="card">
-<div class="icon">🕹️</div>
-<h3>Super Nintendo</h3>
-<p>Aventura e jogos 16 bits</p>
-<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/free/tag-homebrew/tag-snes-rom">Encontrar jogos ↗</a>
-</div>
-
-<div class="card">
-<div class="icon">⚡</div>
-<h3>Mega Drive</h3>
-<p>Jogos independentes de ação</p>
-<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/free/tag-homebrew/tag-sega-genesis">Encontrar jogos ↗</a>
-</div>
-
-<div class="card">
-<div class="icon">🎲</div>
-<h3>Game Boy</h3>
-<p>Jogos portáteis clássicos</p>
-<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/downloadable/tag-gameboy-rom/tag-homebrew">Encontrar jogos ↗</a>
-</div>
-
-<div class="card">
-<div class="icon">🌈</div>
-<h3>Game Boy Color</h3>
-<p>Jogos portáteis coloridos</p>
-<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/games/tag-gameboy-rom/tag-homebrew">Encontrar jogos ↗</a>
-</div>
-
-<div class="card">
-<div class="icon">🚀</div>
-<h3>Game Boy Advance</h3>
-<p>Explore projetos independentes</p>
-<a class="btn" target="_blank" rel="noopener noreferrer" href="https://itch.io/search?q=game+boy+advance+homebrew+rom">Encontrar jogos ↗</a>
-</div>
-</div>
-<p class="note">Os catálogos são externos. Nem todos os projetos oferecem ROMs compatíveis, gratuitas ou autorizadas para redistribuição. Confira a página de cada criador.</p>
+<p>Importe uma ROM uma única vez e depois toque em Jogar.</p>
+<div id="library" class="grid"></div>
 </section>
 
-<section class="panel" id="setup">
-<h2>📂 Importar e jogar</h2>
-<p>Baixe uma ROM permitida no catálogo, volte aqui e selecione o arquivo salvo no seu dispositivo.</p>
-<label for="core">Selecione o console</label>
+<section class="panel" id="addPanel">
+<h2>➕ Adicionar jogo</h2>
+
+<label for="title">Nome do jogo</label>
+<input id="title" placeholder="Ex.: Meu jogo retrô" maxlength="100">
+
+<label for="core">Console</label>
 <select id="core">
 <option value="nes">Nintendo NES</option>
 <option value="snes">Super Nintendo</option>
@@ -96,66 +155,391 @@ select,input{width:100%;background:#301b48;color:white;border:1px solid #7946aa;
 <option value="gb">Game Boy</option>
 <option value="gbc">Game Boy Color</option>
 <option value="gba">Game Boy Advance</option>
+<option value="psx">PlayStation 1</option>
+<option value="n64">Nintendo 64</option>
+<option value="psp">PSP (experimental)</option>
 </select>
-<label for="rom">Selecionar ROM</label>
+
+<label for="rom">Arquivo ROM</label>
 <input id="rom" type="file">
-<p class="note">Nenhum arquivo é enviado ao servidor do STANLEY PLAY. A primeira execução precisa de internet para carregar o EmulatorJS.</p>
-<button id="start" disabled>▶ INICIAR JOGO</button>
+
+<label for="bios">BIOS, se necessária</label>
+<input id="bios" type="file">
+
+<p class="notice">
+PS1: prefira arquivos CHD ou PBP.
+Jogos BIN/CUE com vários arquivos precisam de suporte adicional.
+PSP pode não funcionar nesta hospedagem.
+Use apenas ROMs e BIOS que você tenha direito de utilizar.
+</p>
+
+<button id="save">💾 Salvar na Biblioteca</button>
 <p id="status" role="status"></p>
 </section>
 
-<section class="panel" id="player">
-<button onclick="location.reload()">↩ Trocar jogo</button>
-<p>Use controles na tela, teclado ou gamepad compatível.</p>
-<div id="game"></div>
+<section class="panel" id="catalogPanel">
+<h2>🗂 Encontrar jogos por console</h2>
+<p>Explore catálogos de jogos homebrew autorizados.</p>
+<div class="grid" id="catalog"></div>
 </section>
+
+<section class="panel" id="player">
+<div class="row">
+<button class="secondary" id="back">← Biblioteca</button>
+<button class="secondary" id="full">⛶ Tela cheia</button>
+</div>
+<h2 id="playing">Jogo</h2>
+<div id="game"></div>
+<p class="notice">
+Use os controles virtuais do EmulatorJS.
+A primeira execução exige internet.
+O desempenho depende do console e do dispositivo.
+</p>
+</section>
+
 </main>
+
 <script>
-const rom=document.getElementById('rom');
-const core=document.getElementById('core');
-const start=document.getElementById('start');
-const status=document.getElementById('status');
-let romURL=null;
-rom.addEventListener('change',()=>{
- start.disabled=!rom.files.length;
- status.textContent=rom.files.length?'Arquivo selecionado: '+rom.files[0].name:'';
+const consoles={
+nes:{
+name:"Nintendo NES",
+emoji:"🎮",
+ext:["nes","zip"],
+link:"https://itch.io/games/free/tag-homebrew/tag-nes-rom"
+},
+snes:{
+name:"Super Nintendo",
+emoji:"🕹️",
+ext:["sfc","smc","zip"],
+link:"https://itch.io/search?q=snes+homebrew+rom"
+},
+segaMD:{
+name:"Mega Drive",
+emoji:"⚡",
+ext:["md","gen","bin","zip"],
+link:"https://itch.io/search?q=genesis+homebrew+rom"
+},
+gb:{
+name:"Game Boy",
+emoji:"🎲",
+ext:["gb","zip"],
+link:"https://itch.io/games/downloadable/tag-gameboy-rom/tag-homebrew"
+},
+gbc:{
+name:"Game Boy Color",
+emoji:"🌈",
+ext:["gbc","zip"],
+link:"https://itch.io/search?q=game+boy+color+homebrew+rom"
+},
+gba:{
+name:"Game Boy Advance",
+emoji:"🚀",
+ext:["gba","zip"],
+link:"https://itch.io/search?q=gba+homebrew+rom"
+},
+psx:{
+name:"PlayStation 1",
+emoji:"💿",
+ext:["chd","pbp","bin","img","iso","cue"],
+link:"https://itch.io/search?q=ps1+homebrew"
+},
+n64:{
+name:"Nintendo 64",
+emoji:"🎯",
+ext:["z64","n64","v64","zip"],
+link:"https://itch.io/search?q=nintendo+64+homebrew"
+},
+psp:{
+name:"PSP",
+emoji:"🎮",
+ext:["iso","cso","pbp"],
+link:"https://itch.io/search?q=psp+homebrew"
+}
+};
+
+const $=id=>document.getElementById(id);
+let database;
+let activeRomURL=null;
+let activeBiosURL=null;
+
+const dbOpen=new Promise((resolve,reject)=>{
+const req=indexedDB.open("stanley-retro-v3",1);
+
+req.onupgradeneeded=()=>{
+const db=req.result;
+if(!db.objectStoreNames.contains("roms")){
+db.createObjectStore("roms",{
+keyPath:"id",
+autoIncrement:true
 });
-start.addEventListener('click',()=>{
- const file=rom.files[0];
- if(!file)return;
- const allowed={
-  nes:['nes','zip'],
-  snes:['sfc','smc','zip'],
-  segaMD:['md','gen','bin','zip'],
-  gb:['gb','zip'],
-  gbc:['gbc','zip'],
-  gba:['gba','zip']
- };
- const ext=file.name.split('.').pop().toLowerCase();
- if(!allowed[core.value].includes(ext)){
-  status.textContent='Arquivo incompatível com o console selecionado.';
-  return;
- }
- romURL=URL.createObjectURL(file);
- document.getElementById('setup').style.display='none';
- document.getElementById('player').style.display='block';
- window.EJS_player='#game';
- window.EJS_core=core.value;
- window.EJS_gameUrl=romURL;
- window.EJS_gameName=file.name;
- window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
- window.EJS_color='#8b5cf6';
- window.EJS_startOnLoaded=true;
- const script=document.createElement('script');
- script.src='https://cdn.emulatorjs.org/stable/data/loader.js';
- script.onerror=()=>{
-  document.getElementById('player').insertAdjacentHTML('beforeend','<p>Erro ao carregar o emulador. Verifique a conexão.</p>');
- };
- document.body.appendChild(script);
+}
+};
+
+req.onsuccess=()=>{
+database=req.result;
+resolve(database);
+};
+
+req.onerror=()=>reject(req.error);
 });
-window.addEventListener('pagehide',()=>{
- if(romURL)URL.revokeObjectURL(romURL);
+
+function store(mode){
+return database.transaction("roms",mode).objectStore("roms");
+}
+
+async function allGames(){
+await dbOpen;
+return new Promise((resolve,reject)=>{
+const q=store("readonly").getAll();
+q.onsuccess=()=>resolve(q.result);
+q.onerror=()=>reject(q.error);
 });
+}
+
+async function getGame(id){
+await dbOpen;
+return new Promise((resolve,reject)=>{
+const q=store("readonly").get(id);
+q.onsuccess=()=>resolve(q.result);
+q.onerror=()=>reject(q.error);
+});
+}
+
+async function putGame(item){
+await dbOpen;
+return new Promise((resolve,reject)=>{
+const q=store("readwrite").add(item);
+q.onsuccess=()=>resolve(q.result);
+q.onerror=()=>reject(q.error);
+});
+}
+
+async function deleteGame(id){
+await dbOpen;
+return new Promise((resolve,reject)=>{
+const q=store("readwrite").delete(id);
+q.onsuccess=()=>resolve();
+q.onerror=()=>reject(q.error);
+});
+}
+
+function showCatalog(){
+const el=$("catalog");
+el.replaceChildren();
+
+Object.entries(consoles).forEach(([key,c])=>{
+const card=document.createElement("article");
+card.className="card";
+
+const art=document.createElement("div");
+art.className="art";
+art.textContent=c.emoji;
+
+const title=document.createElement("h3");
+title.textContent=c.name;
+
+const link=document.createElement("a");
+link.className="btn";
+link.textContent="Encontrar jogos ↗";
+link.href=c.link;
+link.target="_blank";
+link.rel="noopener noreferrer";
+
+card.append(art,title,link);
+el.append(card);
+});
+}
+
+async function render(){
+try{
+const items=await allGames();
+$("count").textContent=items.length+" jogo(s)";
+
+const el=$("library");
+el.replaceChildren();
+
+if(!items.length){
+const p=document.createElement("p");
+p.textContent="Nenhum jogo salvo. Adicione sua primeira ROM abaixo.";
+el.append(p);
+}
+
+items.forEach(g=>{
+const c=consoles[g.core];
+if(!c)return;
+
+const card=document.createElement("article");
+card.className="card";
+
+const art=document.createElement("div");
+art.className="art";
+art.textContent=c.emoji;
+
+const title=document.createElement("h3");
+title.textContent=g.title;
+
+const info=document.createElement("p");
+info.textContent=c.name+" • "+(g.rom.size/1048576).toFixed(1)+" MB";
+
+const play=document.createElement("button");
+play.className="btn";
+play.textContent="▶ Jogar";
+play.onclick=()=>launch(g.id);
+
+const del=document.createElement("button");
+del.className="btn danger";
+del.textContent="Excluir jogo";
+
+del.onclick=async()=>{
+if(!confirm("Excluir "+g.title+" da biblioteca?"))return;
+try{
+await deleteGame(g.id);
+await render();
+}catch(e){
+alert("Não foi possível excluir: "+e.message);
+}
+};
+
+card.append(art,title,info,play,del);
+el.append(card);
+});
+
+}catch(e){
+$("status").textContent="Erro na biblioteca: "+e.message;
+}
+}
+
+$("save").addEventListener("click",async()=>{
+const file=$("rom").files[0];
+const core=$("core").value;
+const c=consoles[core];
+
+if(!file){
+$("status").textContent="Selecione uma ROM.";
+return;
+}
+
+const ext=file.name.split(".").pop().toLowerCase();
+
+if(!c.ext.includes(ext)){
+$("status").textContent="Extensão incompatível com o console.";
+return;
+}
+
+if(file.size>300*1048576){
+if(!confirm("Arquivo grande. O Safari pode não conseguir armazenar ou executar. Continuar?"))return;
+}
+
+const title=$("title").value.trim()||
+file.name.replace(/\\.[^.]+$/,"");
+
+$("save").disabled=true;
+$("status").textContent="Salvando no dispositivo...";
+
+try{
+await putGame({
+title:title,
+core:core,
+rom:file,
+bios:$("bios").files[0]||null,
+created:Date.now()
+});
+
+$("status").textContent="✅ Jogo salvo! Agora toque em Jogar.";
+
+$("title").value="";
+$("rom").value="";
+$("bios").value="";
+
+await render();
+
+}catch(e){
+$("status").textContent="Falha ao salvar. Verifique armazenamento: "+e.message;
+}finally{
+$("save").disabled=false;
+}
+});
+
+async function launch(id){
+try{
+const g=await getGame(id);
+if(!g)return;
+
+if(g.core==="psp"){
+alert("PSP requer threads e cabeçalhos especiais de segurança. Esta configuração do GitHub Pages não oferece suporte completo. O arquivo permanece salvo na biblioteca.");
+return;
+}
+
+if(g.core==="psx"&&!g.bios){
+if(!confirm("PS1 pode precisar de BIOS. Tentar sem BIOS?"))return;
+}
+
+$("collectionPanel").classList.add("hidden");
+$("addPanel").classList.add("hidden");
+$("catalogPanel").classList.add("hidden");
+
+$("player").style.display="block";
+$("playing").textContent=g.title;
+$("player").scrollIntoView({behavior:"smooth"});
+
+activeRomURL=URL.createObjectURL(g.rom);
+
+if(g.bios){
+activeBiosURL=URL.createObjectURL(g.bios);
+}
+
+window.EJS_player="#game";
+window.EJS_core=g.core;
+window.EJS_gameUrl=activeRomURL;
+window.EJS_gameName=g.title;
+window.EJS_biosUrl=activeBiosURL||"";
+window.EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/";
+window.EJS_color="#8b5cf6";
+window.EJS_startOnLoaded=true;
+window.EJS_threads=false;
+
+const loader=document.createElement("script");
+loader.src="https://cdn.emulatorjs.org/stable/data/loader.js";
+
+loader.onerror=()=>{
+alert("Não foi possível carregar o EmulatorJS. Verifique a internet.");
+};
+
+document.body.append(loader);
+
+}catch(e){
+alert("Erro ao abrir o jogo: "+e.message);
+}
+}
+
+function release(){
+if(activeRomURL){
+URL.revokeObjectURL(activeRomURL);
+activeRomURL=null;
+}
+if(activeBiosURL){
+URL.revokeObjectURL(activeBiosURL);
+activeBiosURL=null;
+}
+}
+
+$("back").onclick=()=>location.reload();
+
+$("full").onclick=()=>{
+const el=$("game");
+if(el.requestFullscreen){
+el.requestFullscreen().catch(()=>{
+alert("Tela cheia indisponível neste navegador.");
+});
+}else{
+alert("Tela cheia indisponível neste navegador.");
+}
+};
+
+window.addEventListener("pagehide",release);
+
+showCatalog();
+render();
 </script>
 </body>
 </html>
