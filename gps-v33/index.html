@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#050c19"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>STANLEY GPS ULTRA | V3.5</title>
+<title>STANLEY GPS ULTRA | V3.6</title>
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22STANLEY%20GPS%20ULTRA%22%2C%22short_name%22%3A%22STANLEY%20GPS%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%2F%22%2C%22background_color%22%3A%22%23050c19%22%2C%22theme_color%22%3A%22%23050c19%22%7D">
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoWBrh0Dk7BUdo=" crossorigin="">
 <style>
@@ -62,6 +62,28 @@
 #map .leaflet-control-container{position:relative;z-index:800}
 #map .leaflet-interactive{cursor:pointer}
 
+
+/* V3.6: camadas corretas e controles de atribuicao mesmo sem CSS externo. */
+#map{z-index:0!important;overflow:hidden!important}
+#map .leaflet-control-container{position:absolute!important;inset:0!important;z-index:800!important;pointer-events:none}
+#map .leaflet-top,#map .leaflet-bottom{position:absolute!important;z-index:1000!important;pointer-events:none}
+#map .leaflet-top{top:0!important;bottom:auto!important}
+#map .leaflet-bottom{bottom:0!important;top:auto!important}
+#map .leaflet-left{left:0!important;right:auto!important}
+#map .leaflet-right{right:0!important;left:auto!important}
+#map .leaflet-control{position:relative!important;z-index:800!important;pointer-events:auto}
+#map .leaflet-control-attribution{margin:0!important;padding:2px 7px!important;background:#071425e8!important;line-height:1.35!important;font-size:9px!important;white-space:normal!important;max-width:85vw!important;text-align:right!important}
+#map img.leaflet-tile{visibility:visible}
+.app{z-index:900!important}
+.top{background:linear-gradient(180deg,#081629ed,#081629ba 67%,transparent);border-radius:20px;padding:8px}
+.sheet{max-height:min(58dvh,540px)!important;box-shadow:0 -8px 40px #020712c7}
+.sheetContent{overscroll-behavior:contain}
+.sheet.collapsed{max-height:240px!important}
+.driving .sheet{max-height:min(45dvh,390px)!important}
+#tileDiagnostic{display:none!important}
+.mapWarning{top:auto!important;bottom:calc(50dvh + 10px)!important;z-index:1100!important}
+@media(max-height:760px){.sheet{max-height:52dvh!important}.sheet.collapsed{max-height:220px!important}}
+
 </style>
 </head>
 <body>
@@ -70,7 +92,7 @@
 <div id="tileDiagnostic" aria-live="polite" style="position:fixed;z-index:970;left:12px;top:calc(env(safe-area-inset-top) + 300px);background:#092035eb;border:1px solid #81cfff66;border-radius:10px;padding:6px 9px;font:10px system-ui;color:#daf3ff;pointer-events:none">Mapa: iniciando...</div>
 <div class="app" id="app">
  <header class="top">
-  <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.5</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
+  <div class="topline"><div class="logo"><div class="mark">&#9672;</div><div><div class="brand">STANLEY <b>GPS</b></div><div class="micro">U L T R A &nbsp; / &nbsp; V 3.6</div></div></div><div class="signal glass" id="signal"><i></i><span id="signalText">ATIVAR GPS</span></div></div>
   <div class="search glass"><span class="glassIcon">&#8981;</span><input id="search" placeholder="Para onde vamos hoje?" aria-label="Buscar endere&#231;o"><button class="roundSearch" id="searchButton" aria-label="Pesquisar">&#10140;</button></div>
   <div class="results glass" id="results" role="listbox"></div>
   <nav class="quick"><button id="quickHome">&#8962; &nbsp;Casa</button><button id="quickWork">&#9635; &nbsp;Trabalho</button><button id="quickFavorite">&#9733; &nbsp;Favoritos</button><button id="quickGPS">&#9678; &nbsp;Meu GPS</button></nav>
@@ -118,7 +140,7 @@ function mapDiagnostic(){
 }
 function mountTiles(index=0){
   if(tiles){tiles.off();map.removeLayer(tiles)}
-  tileErrors=0; tileLoaded=0; S.style=index;
+  tileErrors=0; tileLoaded=0; S.style=index;el('mapWarning').style.display='none';
   const config=layers[index];
   tiles=L.tileLayer(config.url,{
     subdomains:config.subdomains,attribution:config.credit,
@@ -126,9 +148,9 @@ function mountTiles(index=0){
     detectRetina:false,updateWhenIdle:false,keepBuffer:2,
     crossOrigin:false
   }).addTo(map);
-  tiles.on('tileload',()=>{tileLoaded++;mapDiagnostic()});
+  tiles.on('tileload',()=>{tileLoaded++;mapDiagnostic();if(tileLoaded>0)el('mapWarning').style.display='none'});
   tiles.on('tileerror',()=>{tileErrors++;mapDiagnostic();
-    if(tileErrors===3){el('mapWarning').style.display='block';setTimeout(()=>el('mapWarning').style.display='none',5500)}
+    if(tileErrors>=3&&tileLoaded===0){el('mapWarning').style.display='block'}
   });
   mapDiagnostic();
   requestAnimationFrame(()=>map.invalidateSize({pan:false}));
@@ -239,12 +261,12 @@ function setDestination(d){stop();S.destination=d;S.routes=[];S.selected=0;S.req
 async function routeTo(){
  if(!S.destination||!S.position)return;
  const request=++S.request,p=S.position,d=S.destination;
- el('eyebrow').textContent='CALCULANDO TRAJETO';
+ el('eyebrow').textContent='CALCULANDO TRAJETO';el('routeList').replaceChildren();
  try{
   const url=`https://router.project-osrm.org/route/v1/driving/${p.lon},${p.lat};${d.lon},${d.lat}?overview=full&geometries=geojson&steps=true&alternatives=true`;
   const response=await fetch(url);if(!response.ok)throw Error('route');const j=await response.json();if(request!==S.request)return;if(j.code!=='Ok'||!j.routes?.length)throw Error('empty');
   S.routes=j.routes;S.selected=0;S.lastVoice=-1;drawRoute();renderSummary();renderRouteChoices();renderSteps();el('eyebrow').textContent=S.running?'NAVEGA\u00c7\u00c3O ATIVA':'ROTAS ENCONTRADAS';if(S.running)updateGuidance();
- }catch(e){if(request!==S.request)return;el('eyebrow').textContent='ROTA INDISPON\u00cdVEL';toast('N\u00e3o foi poss\u00edvel calcular a rota. Tente novamente.');}
+ }catch(e){if(request!==S.request)return;el('eyebrow').textContent='ROTA INDISPON\u00cdVEL';el('etaLabel').textContent='Falha no servi\u00e7o de rotas';toast('Servidor de rotas indispon\u00edvel. Toque em Iniciar para tentar novamente.');el('routeList').replaceChildren();const b=document.createElement('button');b.className='route';b.style.minWidth='100%';b.textContent='Abrir dire\u00e7\u00f5es no Google Maps';b.onclick=()=>{const d=S.destination,p=S.position;if(!d)return;const link='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(d.lat+','+d.lon)+'&travelmode=driving'+(p?'&origin='+encodeURIComponent(p.lat+','+p.lon):'');window.open(link,'_blank','noopener')};el('routeList').appendChild(b);console.warn('Falha roteamento',e);}
 }
 function drawRoute(){routeLines.forEach(x=>map.removeLayer(x));routeLines=[];S.routes.forEach((r,i)=>{const active=i===S.selected;const l=L.polyline(r.geometry.coordinates.map(coord),{color:active?'#26cfff':'#8199b6',weight:active?8:5,opacity:active?1:.45,lineCap:'round',lineJoin:'round'}).addTo(map);l.on('click',()=>selectRoute(i));routeLines.push(l)});routeLines[S.selected]?.bringToFront();if(!S.running)viewFullRoute()}
 function viewFullRoute(){const l=routeLines[S.selected];if(l){map.fitBounds(l.getBounds(),{paddingTopLeft:[30,175],paddingBottomRight:[30,270],maxZoom:15,animate:true})}else if(S.position)map.setView([S.position.lat,S.position.lon],16)}
@@ -276,7 +298,7 @@ function setTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.tog
 el('tabNavigate').onclick=()=>{setTab('tabNavigate');el('sheet').classList.remove('collapsed')};
 el('tabRoutes').onclick=()=>{setTab('tabRoutes');if(!S.routes.length)toast('Pesquise um destino para visualizar rotas.');else{el('sheet').classList.remove('collapsed');el('routeList').scrollIntoView({behavior:'smooth',block:'nearest'})}};
 el('tabSaved').onclick=()=>{setTab('tabSaved');openSaved()};el('tabMap').onclick=()=>{setTab('tabMap');el('sheet').classList.add('collapsed');viewFullRoute()};
-el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.5: mapas OpenStreetMap/HOT, busca Photon/Nominatim, rotas OSRM. Sem trÃ¢nsito ao vivo/offline.')};
+el('tabSettings').onclick=()=>{setTab('tabSettings');toast('V3.6: mapas OpenStreetMap/HOT, busca Photon/Nominatim, rotas OSRM. Sem trÃ¢nsito ao vivo/offline.')};
 map.on('dragstart',()=>{S.following=false});
 // Quando o nÃºmero nÃ£o existe no mapa, pressione por 1 segundo no ponto desejado.
 let pinPressTimer=null, pinPressStartedAt=0;
