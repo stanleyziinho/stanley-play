@@ -164,24 +164,39 @@ const allowed={
 let games=[];
 let loading=false;
 
+
 function safeRom(path){
- if(typeof path!=="string")return null;
+  if(typeof path !== "string") return null;
 
- // Só permite ROMs hospedadas nesta plataforma.
- if(!/^roms\/[a-zA-Z0-9_./-]+$/.test(path)){
-  return null;
- }
+  // Aceita somente arquivos da pasta roms.
+  if(!path.startsWith("roms/")) return null;
 
- if(path.split("/").includes("..")){
-  return null;
- }
+  const partes = path.split("/");
 
- const url=new URL(path,location.href);
+  // Bloqueia caminhos inválidos.
+  if(partes.some(p => !p || p === "." || p === "..")){
+    return null;
+  }
 
- if(url.origin!==location.origin)return null;
+  // Permite espaços, parênteses, vírgulas e %.
+  const valido = partes.every(p =>
+    /^[a-zA-Z0-9 _().,%+-]+$/.test(p)
+  );
 
- return url.href;
+  if(!valido) return null;
+
+  // Codifica o nome de cada arquivo corretamente.
+  const caminho = partes
+    .map(p => encodeURIComponent(p))
+    .join("/");
+
+  const url = new URL(caminho, location.href);
+
+  if(url.origin !== location.origin) return null;
+
+  return url.href;
 }
+
 
 function safeCover(path){
  if(typeof path!=="string")return null;
