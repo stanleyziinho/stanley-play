@@ -8,15 +8,7 @@
       "console": "gba",
       "categoria": "Diversão",
       "arquivo": "roms/JoeWhyte.gba",
-      "capa": ""
-    },
-    {
-      "id": "mk64",
-      "nome": "MK 64",
-      "console": "n64",
-      "categoria": "Nintendo 64",
-      "arquivo": "roms/MK_64.z64",
-      "capa": ""
+      "capa": "capas/joe-whyte.jpg"
     },
     {
       "id": "mario-kart-64",
@@ -24,7 +16,7 @@
       "console": "n64",
       "categoria": "Corrida",
       "arquivo": "roms/Mario Kart 64.zip",
-      "capa": ""
+      "capa": "capas/mario-kart-64.jpg"
     },
     {
       "id": "mario-party-64",
@@ -32,7 +24,7 @@
       "console": "n64",
       "categoria": "Diversão",
       "arquivo": "roms/Mario%20Party%20(Europe)%20(En,Fr,De).zip",
-      "capa": ""
+      "capa": "capas/mario-party.jpg"
     },
     {
       "id": "rollie",
@@ -40,7 +32,7 @@
       "console": "nes",
       "categoria": "Plataforma",
       "arquivo": "roms/Rollie_PAL.nes",
-      "capa": ""
+      "capa": "capas/rollie.jpg"
     },
     {
       "id": "super-flappy-mario",
@@ -48,7 +40,7 @@
       "console": "nes",
       "categoria": "Arcade",
       "arquivo": "roms/SuperFlappyMario.nes",
-      "capa": ""
+      "capa": "capas/flappy-mario.jpg"
     },
     {
       "id": "super-mario-1998",
@@ -56,7 +48,7 @@
       "console": "segaMD",
       "categoria": "Plataforma",
       "arquivo": "roms/Super_Mario_2_1998_Unl_f1 (1).bin",
-      "capa": ""
+      "capa": "capas/super-mario-1998.jpg"
     },
     {
       "id": "super-nintendo",
@@ -64,7 +56,7 @@
       "console": "snes",
       "categoria": "Super Nintendo",
       "arquivo": "roms/game.sfc",
-      "capa": ""
+      "capa": "capas/super-nintendo.jpg"
     }
   ]
 }
