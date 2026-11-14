@@ -165,52 +165,48 @@ let games=[];
 let loading=false;
 
 
-function safeRom(path){
+
+function normalizeLocalPath(path, folder){
   if(typeof path !== "string") return null;
 
-  // Aceita somente arquivos da pasta roms.
-  if(!path.startsWith("roms/")) return null;
+  const texto = path.trim();
+  if(!texto.startsWith(folder + "/")) return null;
 
-  const partes = path.split("/");
+  const partes = texto.split("/");
 
-  // Bloqueia caminhos inválidos.
   if(partes.some(p => !p || p === "." || p === "..")){
     return null;
   }
 
-  // Permite espaços, parênteses, vírgulas e %.
-  const valido = partes.every(p =>
-    /^[a-zA-Z0-9 _().,%+-]+$/.test(p)
-  );
+  const permitido = /^[a-zA-Z0-9 _().,%+\-]+$/;
 
-  if(!valido) return null;
+  if(!partes.every(p => permitido.test(p))){
+    return null;
+  }
 
-  // Codifica o nome de cada arquivo corretamente.
-  const caminho = partes
-    .map(p => encodeURIComponent(p))
-    .join("/");
+  try {
+    const caminho = partes
+      .map(p => encodeURIComponent(p))
+      .join("/");
 
-  const url = new URL(caminho, location.href);
+    const url = new URL(caminho, location.href);
 
-  if(url.origin !== location.origin) return null;
+    if(url.origin !== location.origin) return null;
 
-  return url.href;
+    return url.href;
+  } catch(e) {
+    return null;
+  }
 }
 
+function safeRom(path){
+  return normalizeLocalPath(path, "roms");
+}
 
 function safeCover(path){
- if(typeof path!=="string")return null;
-
- if(!/^capas\/[a-zA-Z0-9_./-]+$/.test(path)){
-  return null;
- }
-
- if(path.split("/").includes("..")){
-  return null;
- }
-
- return new URL(path,location.href).href;
+  return normalizeLocalPath(path, "capas");
 }
+
 
 function status(text){
  $("status").textContent=text;
