@@ -12,3 +12,25 @@
     }
   ]
 }
+
+{
+  "versao": "5.0",
+  "jogos": [
+    {
+      "id": "mk64",
+      "nome": "MK 64",
+      "console": "n64",
+      "categoria": "Nintendo 64",
+      "arquivo": "roms/MK_64.z64",
+      "capa": ""
+    },
+    {
+      "id": "mario-kart-64",
+      "nome": "Mario Kart 64",
+      "console": "n64",
+      "categoria": "Corrida",
+      "arquivo": "roms/Mario Kart 64.zip",
+      "capa": ""
+    }
+  ]
+}
