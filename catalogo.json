@@ -3,6 +3,14 @@
   "versao": "5.0",
   "jogos": [
     {
+      "id": "joe-whyte",
+      "nome": "Joe Whyte's Cookin' Game",
+      "console": "gba",
+      "categoria": "Diversão",
+      "arquivo": "roms/JoeWhyte.gba",
+      "capa": ""
+    },
+    {
       "id": "mk64",
       "nome": "MK 64",
       "console": "n64",
@@ -16,6 +24,46 @@
       "console": "n64",
       "categoria": "Corrida",
       "arquivo": "roms/Mario Kart 64.zip",
+      "capa": ""
+    },
+    {
+      "id": "mario-party-64",
+      "nome": "Mario Party",
+      "console": "n64",
+      "categoria": "Diversão",
+      "arquivo": "roms/Mario%20Party%20(Europe)%20(En,Fr,De).zip",
+      "capa": ""
+    },
+    {
+      "id": "rollie",
+      "nome": "Rollie",
+      "console": "nes",
+      "categoria": "Plataforma",
+      "arquivo": "roms/Rollie_PAL.nes",
+      "capa": ""
+    },
+    {
+      "id": "super-flappy-mario",
+      "nome": "Super Flappy Mario",
+      "console": "nes",
+      "categoria": "Arcade",
+      "arquivo": "roms/SuperFlappyMario.nes",
+      "capa": ""
+    },
+    {
+      "id": "super-mario-1998",
+      "nome": "Super Mario 2 1998",
+      "console": "segaMD",
+      "categoria": "Plataforma",
+      "arquivo": "roms/Super_Mario_2_1998_Unl_f1 (1).bin",
+      "capa": ""
+    },
+    {
+      "id": "super-nintendo",
+      "nome": "Jogo Super Nintendo",
+      "console": "snes",
+      "categoria": "Super Nintendo",
+      "arquivo": "roms/game.sfc",
       "capa": ""
     }
   ]
