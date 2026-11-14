@@ -6,6 +6,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#130922">
 <title>STANLEY RETRO V4.1 CORRIGIDO</title>
+
+<script>
+  // Abre os jogos oficiais como página inicial.
+  // Mantém a biblioteca pessoal acessível.
+  if (
+    !new URLSearchParams(window.location.search)
+      .has("biblioteca")
+  ) {
+    window.location.replace("./oficiais.html");
+  }
+</script>
+
 <style>
 *{box-sizing:border-box}
 body{
