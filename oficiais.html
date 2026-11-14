@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#130922">
+<title>STANLEY RETRO | Jogos Oficiais V5.0</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:radial-gradient(circle at top right,#3d176b,#080611 60%);
+ color:#fff;
+ font-family:system-ui,-apple-system,Arial,sans-serif;
+ min-height:100vh
+}
+main{max-width:1100px;margin:auto;padding:16px}
+header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:12px
+}
+h1{font-size:clamp(27px,7vw,43px);margin:18px 0 5px}
+h1 span{color:#c08cff}
+h2{font-size:21px}
+p{color:#c4b2d6;line-height:1.5}
+a{text-decoration:none;color:#fff}
+button{font:inherit;cursor:pointer}
+.btn{
+ display:inline-block;
+ padding:12px 16px;
+ border:1px solid #965add;
+ border-radius:12px;
+ color:white;
+ background:#7534cf;
+ font-weight:bold;
+ font-size:14px
+}
+.secondary{background:#302044}
+.hero{
+ background:linear-gradient(120deg,#502080,#160a2a);
+ padding:20px;
+ border:1px solid #7146ab;
+ border-radius:20px;
+ margin:15px 0
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:13px;
+ margin:15px 0
+}
+.card{
+ background:#211332;
+ border:1px solid #593684;
+ border-radius:16px;
+ overflow:hidden
+}
+.cover{
+ height:160px;
+ background:linear-gradient(140deg,#713dab,#26133f);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:55px
+}
+.cover img{
+ width:100%;
+ height:100%;
+ object-fit:cover
+}
+.info{padding:12px}
+.info h3{margin:5px 0;font-size:15px;overflow-wrap:anywhere}
+.tag{
+ display:inline-block;
+ background:#513178;
+ border-radius:20px;
+ padding:5px 9px;
+ font-size:11px
+}
+.info .btn{width:100%;margin-top:10px}
+#game{
+ background:#000;
+ width:100%;
+ height:min(72vh,580px);
+ min-height:340px;
+ border-radius:15px;
+ overflow:hidden
+}
+#player{margin-top:18px}
+#status{
+ padding:15px;
+ background:#241637;
+ border:1px solid #51347e;
+ border-radius:12px;
+ margin:15px 0
+}
+.empty{
+ padding:25px;
+ text-align:center;
+ background:#211332;
+ border-radius:16px;
+ grid-column:1/-1
+}
+[hidden]{display:none!important}
+@media(min-width:700px){
+ .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .cover{height:190px}
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <a href="./retro.html" class="btn secondary">← STANLEY RETRO</a>
+ <span class="tag">V5.0 • OFICIAL</span>
+</header>
+
+<div class="hero">
+ <h1>STANLEY <span>RETRO</span></h1>
+ <strong>🎮 JOGOS PRONTOS PARA JOGAR</strong>
+ <p>Escolha um jogo e divirta-se!</p>
+</div>
+
+<section id="catalogSection">
+ <h2>⭐ Biblioteca Oficial</h2>
+ <p id="count">Carregando catálogo...</p>
+ <div id="catalog" class="grid"></div>
+</section>
+
+<section id="player" hidden>
+ <h2 id="gameTitle">Preparando jogo...</h2>
+ <button id="back" class="btn secondary">
+  ← Escolher outro jogo
+ </button>
+ <div id="status" role="status">
+  Preparando emulador...
+ </div>
+ <div id="game"></div>
+ <p>
+  Se houver cortes no áudio, experimente
+  desativar o VSync nas configurações do emulador.
+ </p>
+</section>
+
+</main>
+<script>
+const $=id=>document.getElementById(id);
+
+const allowed={
+ nes:"Nintendo NES",
+ snes:"Super Nintendo",
+ segaMD:"Mega Drive",
+ gb:"Game Boy",
+ gbc:"Game Boy Color",
+ gba:"Game Boy Advance",
+ psx:"PlayStation 1",
+ n64:"Nintendo 64"
+};
+
+let games=[];
+let loading=false;
+
+function safeRom(path){
+ if(typeof path!=="string")return null;
+
+ // Só permite ROMs hospedadas nesta plataforma.
+ if(!/^roms\/[a-zA-Z0-9_./-]+$/.test(path)){
+  return null;
+ }
+
+ if(path.split("/").includes("..")){
+  return null;
+ }
+
+ const url=new URL(path,location.href);
+
+ if(url.origin!==location.origin)return null;
+
+ return url.href;
+}
+
+function safeCover(path){
+ if(typeof path!=="string")return null;
+
+ if(!/^capas\/[a-zA-Z0-9_./-]+$/.test(path)){
+  return null;
+ }
+
+ if(path.split("/").includes("..")){
+  return null;
+ }
+
+ return new URL(path,location.href).href;
+}
+
+function status(text){
+ $("status").textContent=text;
+}
+
+function emptyMessage(text){
+ const div=document.createElement("div");
+ div.className="empty";
+ div.textContent=text;
+ $("catalog").append(div);
+}
+
+function render(){
+ const list=$("catalog");
+ list.replaceChildren();
+
+ $("count").textContent=games.length+
+  " jogo(s) disponível(is)";
+
+ if(!games.length){
+  emptyMessage(
+   "Os jogos oficiais aparecerão aqui " +
+   "assim que forem cadastrados."
+  );
+  return;
+ }
+
+ for(const g of games){
+  const card=document.createElement("article");
+  card.className="card";
+
+  const cover=document.createElement("div");
+  cover.className="cover";
+  cover.textContent="🎮";
+
+  const imageUrl=safeCover(g.capa);
+  if(imageUrl){
+   const img=new Image();
+   img.alt="Capa de "+g.nome;
+   img.onload=()=>{
+    cover.replaceChildren(img);
+   };
+   img.onerror=()=>{};
+   img.src=imageUrl;
+  }
+
+  const info=document.createElement("div");
+  info.className="info";
+
+  const tag=document.createElement("span");
+  tag.className="tag";
+  tag.textContent=allowed[g.console];
+
+  const title=document.createElement("h3");
+  title.textContent=g.nome;
+
+  const category=document.createElement("p");
+  category.textContent=g.categoria||"Jogo retrô";
+
+  const btn=document.createElement("button");
+  btn.className="btn";
+  btn.textContent="▶ JOGAR";
+  btn.onclick=()=>play(g);
+
+  info.append(tag,title,category,btn);
+  card.append(cover,info);
+  list.append(card);
+ }
+}
+
+async function loadCatalog(){
+ try{
+  const response=await fetch(
+   "./catalogo.json?nocache="+Date.now(),
+   {cache:"no-store"}
+  );
+
+  if(!response.ok){
+   throw Error("Catálogo não encontrado.");
+  }
+
+  const data=await response.json();
+  if(!Array.isArray(data.jogos)){
+   throw Error("Formato inválido de catálogo.");
+  }
+
+  const ids=new Set();
+
+  games=data.jogos.filter(g=>{
+   if(!g||typeof g!=="object")return false;
+   if(typeof g.id!=="string"||!g.id.trim())return false;
+   if(ids.has(g.id))return false;
+   if(typeof g.nome!=="string")return false;
+   if(!allowed[g.console])return false;
+   if(!safeRom(g.arquivo))return false;
+   ids.add(g.id);
+   return true;
+  });
+
+  render();
+
+ }catch(e){
+  $("count").textContent="Falha ao carregar jogos.";
+  $("catalog").replaceChildren();
+  emptyMessage(
+   "Erro: "+e.message+
+   " Verifique se catalogo.json foi publicado."
+  );
+ }
+}
+
+async function play(g){
+ if(loading)return;
+
+ loading=true;
+
+ $("catalogSection").hidden=true;
+ $("player").hidden=false;
+ $("gameTitle").textContent=g.nome;
+ status("Localizando jogo...");
+
+ try{
+  const romUrl=safeRom(g.arquivo);
+  if(!romUrl)throw Error("Caminho da ROM inválido.");
+
+  // Verifica a existência e baixa a ROM
+  // antes de iniciar o emulador.
+  const response=await fetch(romUrl,{
+   cache:"default"
+  });
+
+  if(!response.ok){
+   throw Error(
+    "ROM não encontrada na pasta roms/. " +
+    "Confira o nome do arquivo."
+   );
+  }
+
+  const blob=await response.blob();
+  if(!blob.size){
+   throw Error("O arquivo da ROM está vazio.");
+  }
+
+  const objectUrl=URL.createObjectURL(blob);
+
+  // Mantém os arquivos da ROM disponíveis
+  // durante a sessão de emulação.
+  window.__stanleyRomUrl=objectUrl;
+
+  window.EJS_player="#game";
+  window.EJS_core=g.console;
+  window.EJS_gameUrl=objectUrl;
+  window.EJS_gameName=g.nome;
+  window.EJS_pathtodata=
+   "https://cdn.emulatorjs.org/stable/data/";
+  window.EJS_color="#8b5cf6";
+  window.EJS_volume=0.65;
+  window.EJS_startOnLoaded=true;
+  window.EJS_threads=false;
+
+  status("Carregando emulador...");
+
+  const script=document.createElement("script");
+  script.src=
+   "https://cdn.emulatorjs.org/stable/data/loader.js";
+
+  script.onload=()=>{
+   status(
+    "Emulador carregado. " +
+    "Aguarde a inicialização do jogo."
+   );
+  };
+
+  script.onerror=()=>{
+   status(
+    "Não foi possível carregar o emulador. " +
+    "Verifique sua conexão."
+   );
+  };
+
+  document.body.append(script);
+
+ }catch(e){
+  status("Erro: "+e.message);
+  loading=false;
+ }
+}
+
+$("back").onclick=()=>{
+ // Recarrega a página para liberar o emulador.
+ location.href="./oficiais.html";
+};
+
+window.addEventListener("pagehide",()=>{
+ if(window.__stanleyRomUrl){
+  URL.revokeObjectURL(window.__stanleyRomUrl);
+ }
+});
+
+loadCatalog();
+</script>
+</body>
+</html>
