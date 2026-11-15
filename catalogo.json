@@ -65,7 +65,48 @@
   "categoria": "Plataforma",
   "arquivo": "roms/Sonic.zip",
   "capa": "capas/sonic.jpg"
+},
+
+{
+  "id": "need-for-speed-most-wanted",
+  "nome": "Need for Speed: Most Wanted",
+  "console": "gba",
+  "categoria": "Corrida",
+  "arquivo": "roms/Need for Speed_ Most Wanted.zip",
+  "capa": "capas/need-for-speed-most-wanted.jpg"
+},
+
+{
+  "id": "fifa-99",
+  "nome": "FIFA 99",
+  "console": "n64",
+  "categoria": "Esportes",
+  "arquivo": "roms/FIFA 99.zip",
+  "capa": "capas/fifa-99.jpg"
+},
+
+{
+  "id": "donkey-kong-country",
+  "nome": "Donkey Kong Country",
+  "console": "snes",
+  "categoria": "Plataforma",
+  "arquivo": "roms/Donkeykong.zip",
+  "capa": "capas/donkey-kong-country.jpg"
+},
+
+{
+  "id": "street-fighter-ii-turbo",
+  "nome": "Street Fighter II Turbo",
+  "console": "snes",
+  "categoria": "Luta",
+  "arquivo": "roms/Street Fighter II Turbo (V1.0) (E) [!].zip",
+  "capa": "capas/street-fighter-ii-turbo.jpg"
 }
+
+
+
+
+
 
   ]
 }
