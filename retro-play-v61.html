@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#130922">
+<title>STANLEY RETRO • Player V6.1</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0615;color:#f8edff;font-family:system-ui,-apple-system,Arial,sans-serif}main{max-width:1150px;margin:auto;padding:14px}header{display:flex;align-items:center;gap:13px;justify-content:space-between;flex-wrap:wrap}h1{font-size:clamp(18px,4vw,27px)}h1 span{color:#bf8aff}.btn{display:inline-block;padding:12px 15px;border:1px solid #a65dec;background:#4b236b;border-radius:11px;color:#fff;text-decoration:none;font:700 13px system-ui;cursor:pointer}.btn:focus-visible{outline:3px solid #f5b7ff}#title{font-size:clamp(19px,4vw,30px);margin:20px 0 10px}#status{background:#271637;border:1px solid #69418f;border-radius:12px;padding:13px;margin:10px 0;font-size:13px;line-height:1.5}#game{width:100%;min-height:320px;height:min(73vh,660px);background:#030205;border-radius:12px;overflow:hidden;border:1px solid #593184}#actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}p{color:#c8b4d8;font-size:12px;line-height:1.6}.expand{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:20!important;border-radius:0!important}.exit-expand{position:fixed;z-index:30;top:8px;right:8px}.error{color:#ffb9b9}#loading{padding:14px;line-height:1.5}
+</style>
+</head>
+<body><main>
+<header><h1>🎮 STANLEY <span>PLAYER V6.1</span></h1><a class="btn" href="./retro-home-v61-teste.html">← Voltar aos jogos</a></header>
+<h2 id="title">Preparando jogo...</h2>
+<div id="status" role="status">Lendo catálogo de jogos...</div>
+<section id="game" aria-label="Emulador do jogo"></section>
+<div id="actions"><button class="btn" id="retry">↻ Reiniciar jogo</button><button class="btn" id="expand">⛶ Expandir tela</button></div>
+<p>Este player é um teste separado. Não modifica suas ROMs pessoais, saves ou a biblioteca antiga. Para áudio com falhas, experimente desativar VSync no emulador. Expandir tela ocupa a área disponível e não garante fullscreen nativo no Safari.</p>
+</main><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const gameId=new URLSearchParams(location.search).get('game');
+const cores=new Set(['nes','snes','segaMD','gb','gbc','gba','psx','n64']);
+let objectUrl=null;
+function setStatus(t,err=false){$('status').textContent=t;$('status').classList.toggle('error',err)}
+function romPath(path){
+ if(typeof path!=='string'||!path.startsWith('roms/'))return null;
+ const parts=path.split('/');
+ if(parts.some(p=>!p||p==='.'||p==='..'||p.includes('\\')))return null;
+ try{
+  const url=new URL(parts.map(x=>encodeURIComponent(x)).join('/'),location.href);
+  return url.origin===location.origin&&url.pathname.startsWith(new URL('./roms/',location.href).pathname)?url.href:null;
+ }catch(e){return null}
+}
+async function start(){
+ try{
+  if(!gameId)throw Error('Jogo não informado. Volte à biblioteca.');
+  const response=await fetch('./catalogo.json?v='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('Não foi possível carregar o catálogo.');
+  const catalog=await response.json();
+  if(!Array.isArray(catalog.jogos))throw Error('Catálogo inválido.');
+  const g=catalog.jogos.find(x=>x&&x.id===gameId);
+  if(!g)throw Error('Jogo não encontrado no catálogo.');
+  if(!cores.has(g.console))throw Error('Console não suportado neste player.');
+  const rom=romPath(g.arquivo);
+  if(!rom)throw Error('Caminho do arquivo ROM inválido.');
+  $('title').textContent=g.nome;
+  setStatus('Baixando arquivo do jogo...');
+  const file=await fetch(rom);
+  if(!file.ok)throw Error('ROM não encontrada (HTTP '+file.status+').');
+  const data=await file.blob();
+  if(!data.size)throw Error('A ROM está vazia.');
+  if(data.size>80*1024*1024){const ok=confirm('O jogo possui '+Math.round(data.size/1048576)+' MB e pode exigir muita memória. Deseja tentar?');if(!ok){location.href='./retro-home-v61-teste.html';return}}
+  objectUrl=URL.createObjectURL(data);
+  window.EJS_player='#game';
+  window.EJS_core=g.console;
+  window.EJS_gameUrl=objectUrl;
+  window.EJS_gameName=g.nome;
+  window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
+  window.EJS_color='#8b5cf6';
+  window.EJS_volume=0.65;
+  window.EJS_startOnLoaded=true;
+  window.EJS_threads=false;
+  setStatus('Carregando emulador. Aguarde a inicialização do jogo...');
+  const loader=document.createElement('script');
+  loader.src='https://cdn.emulatorjs.org/stable/data/loader.js';
+  loader.onload=()=>setStatus('Motor do emulador carregado. Aguarde a imagem do jogo; se ficar preto, pode haver incompatibilidade.');
+  loader.onerror=()=>setStatus('Não foi possível baixar o motor do emulador. Confira sua conexão.',true);
+  document.body.append(loader);
+ }catch(e){setStatus('Falha ao abrir jogo: '+e.message,true)}
+}
+$('retry').onclick=()=>location.reload();
+$('expand').onclick=()=>{
+ const game=$('game');const is=game.classList.toggle('expand');
+ document.body.style.overflow=is?'hidden':'';
+ $('expand').textContent=is?'↙ Reduzir tela':'⛶ Expandir tela';
+ $('expand').classList.toggle('exit-expand',is);
+};
+window.addEventListener('pagehide',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl)});
+start();
+</script></body></html>
